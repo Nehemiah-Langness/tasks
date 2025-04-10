@@ -1,0 +1,17 @@
+$primary: #2272af;
+$secondary: #abbac9;
+$danger: #b05f21;
+$info: #21b0a2;
+$dark: #232c33;
+$warning: #b08821;
+
+@import '../node_modules/bootstrap/scss/bootstrap.scss';
+
+html, body, #root {
+  height: 100%;
+}
+
+.logo {
+  background: var(--bs-light);
+  border-radius: 25%;
+}
