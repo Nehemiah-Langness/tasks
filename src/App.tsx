@@ -69,7 +69,7 @@ function Layout() {
 }
 
 const storageApiUrl =
-  window.location.hostname === "localhost" ? "http://localhost:3001/data" : "tasks-storage-drbmdvdpgmf5cbed.centralus-01.azurewebsites.net";
+  window.location.hostname === "localhost" ? "http://localhost:3001/data" : "https://tasks-storage-drbmdvdpgmf5cbed.centralus-01.azurewebsites.net";
 
 function Home() {
   const { getAccessTokenSilently, getAccessTokenWithPopup, user } = useAuth0();
