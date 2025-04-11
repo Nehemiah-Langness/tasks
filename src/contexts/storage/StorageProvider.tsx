@@ -9,7 +9,7 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
   useEffect(() => {
     const { host, protocol } = new URL(storageApiUrl);
     const stayAlive = () => {
-      fetch( protocol + '//' + host + "/stay-alive");
+      fetch(protocol + "//" + host + "/stay-alive");
     };
 
     stayAlive();
@@ -47,6 +47,7 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
         .then((data: Partial<SaveFile>) => {
           const file: SaveFile = {
             date: Date.now(),
+            tasks: [],
             ...data,
           };
           setData(file);
