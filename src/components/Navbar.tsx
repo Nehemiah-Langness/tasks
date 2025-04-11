@@ -22,8 +22,12 @@ export function Navbar() {
         </Link>
         {user && (
           <div className="d-flex align-items-center gap-2 text-white h5 mb-0">
-            <span>Welcome, {user.name}</span>{" "}
-            <img src={user.picture} className="rounded-2" style={{ width: "2rem", height: "2rem" }} />
+            <img
+              src={user.picture}
+              className="rounded-2"
+              style={{ width: "2rem", height: "2rem" }}
+            />
+            <span>{user.name}'s Tasks</span>
           </div>
         )}
         <LogoutButton />
