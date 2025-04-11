@@ -1,6 +1,5 @@
 import React from "react";
-import { Task } from "../types/SaveFile";
-
+import { Task } from "../../types/SaveFile";
 
 export const TaskEditContext = React.createContext<{
   cancel: () => void;
