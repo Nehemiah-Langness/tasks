@@ -6,7 +6,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 export function Navbar() {
   const { pathname } = useLocation();
-  const {user} = useAuth0();
+  const { user } = useAuth0();
 
   useEffect(() => {
     window.scrollTo({
@@ -20,7 +20,12 @@ export function Navbar() {
         <Link className="navbar-brand" to="/">
           <Branding height="3rem" />
         </Link>
-        {user && <div className="text-white h5 mb-0">Welcome, {user.name}</div>}
+        {user && (
+          <div className="d-flex align-items-center gap-2 text-white h5 mb-0">
+            <span>Welcome, {user.name}</span>{" "}
+            <img src={user.picture} className="rounded-2" style={{ width: "2rem", height: "2rem" }} />
+          </div>
+        )}
         <LogoutButton />
       </div>
     </nav>

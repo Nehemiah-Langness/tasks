@@ -5,6 +5,7 @@ import { Navbar } from "./components/Navbar";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router";
 import { Footer } from "./components/Footer";
 import { LoginButton } from "./components/LoginButton";
+import { useCallback, useEffect, useState } from "react";
 
 function App() {
   const { isLoading, isAuthenticated, error } = useAuth0();
@@ -67,8 +68,80 @@ function Layout() {
   );
 }
 
+const storageApiUrl =
+  window.location.hostname === "localhost" ? "http://localhost:3001/data" : "tasks-storage-drbmdvdpgmf5cbed.centralus-01.azurewebsites.net";
+
 function Home() {
-  return <div>HOME</div>;
+  const { getAccessTokenSilently, getAccessTokenWithPopup, user } = useAuth0();
+
+  const [data, setData] = useState<object>();
+
+  const getToken = useCallback(async () => {
+    const params = {
+      authorizationParams: {
+        audience: "https://dev-s2un5a06nihn1i1l.us.auth0.com/api/v2/",
+      },
+    };
+
+    return await getAccessTokenSilently(params)
+      .catch(() => {
+        return getAccessTokenWithPopup(params);
+      })
+      .catch((er) => {
+        console.error(er);
+        return null;
+      });
+  }, [getAccessTokenSilently, getAccessTokenWithPopup]);
+
+  useEffect(() => {
+    const getData = async () => {
+      const token = await getToken();
+
+      if (!token) return;
+
+      fetch(storageApiUrl, {
+        headers: {
+          Authorization: token,
+        },
+      }).then(async (result) => {
+        setData(await result.json());
+      });
+    };
+
+    getData();
+  }, [getToken]);
+
+  return (
+    <div>
+      Your Data: <br />
+      <pre>{JSON.stringify(data, undefined, " ")}</pre>
+      <button
+        className="btn btn-primary"
+        onClick={async () => {
+          const token = await getToken();
+          if (!token) {
+            return;
+          }
+
+          fetch(storageApiUrl, {
+            body: JSON.stringify({
+              date: Date.now(),
+              user: user?.email,
+            }),
+            method: "POST",
+            headers: {
+              Authorization: token,
+              "Content-Type": "application/json",
+            },
+          }).then(async (result) => {
+            console.log(await result.json());
+          });
+        }}
+      >
+        Create Save File
+      </button>
+    </div>
+  );
 }
 
 export default App;
