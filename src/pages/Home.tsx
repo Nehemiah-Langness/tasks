@@ -12,7 +12,7 @@ import { TaskEditProvider } from "../contexts/edit-tasks/TaskEditProvider";
 import { TaskRow } from "./home/TaskRow";
 
 export function Home() {
-  const { data, load } = useStorage();
+  const { data, load, spaceLeft, spaceUsed } = useStorage();
   const { open } = useOffCanvas();
 
   useEffect(() => {
@@ -31,6 +31,8 @@ export function Home() {
     return <LoadingMessage />;
   }
 
+  const spaceRemaining = (spaceUsed * 100) / (spaceLeft + spaceUsed);
+
   return (
     <TaskEditProvider>
       <div className="container d-flex flex-column gap-2">
@@ -41,10 +43,30 @@ export function Home() {
           onClick={open}
         >
           <span className="fs-140 fw-light">Your Tasks List</span>
-          <span className="fs-80 ">
-            <FontAwesomeIcon className="text-success" icon={faSave} />{" "}
-            {formatDate(data.date)}
-          </span>
+          <div className="fs-80 ">
+            <div>
+              <FontAwesomeIcon className="text-success" icon={faSave} />{" "}
+              {formatDate(data.date)}
+            </div>
+            <div>
+              <div
+                className="progress position-relative"
+                role="progressbar"
+                aria-label="Example with label"
+                aria-valuenow={spaceRemaining}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
+                <div
+                  className="progress-bar overflow-visible text-dark"
+                  style={{ width: `${spaceRemaining.toFixed()}%` }}
+                ></div>
+                <div className="position-absolute start-0 end-0 top-0 bottom-0 d-flex align-items-center justify-content-center">
+                  {(100 - spaceRemaining).toFixed()}% Available Space
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <NewTaskButton />
 

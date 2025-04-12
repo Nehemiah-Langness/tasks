@@ -1,9 +1,11 @@
 import React from "react";
 
-
-export function Radio<T extends string>({
-  formValue, label, onChange, ...inputProps
-}: React.JSX.IntrinsicElements["input"] & {
+export function Radio<T extends string | number>({
+  formValue,
+  label,
+  onChange,
+  ...inputProps
+}: Omit<React.JSX.IntrinsicElements["input"], 'onChange' | 'value'> & {
   formValue: T;
   value: T;
   label: string;
@@ -16,11 +18,12 @@ export function Radio<T extends string>({
         type="radio"
         checked={inputProps.value === formValue}
         onChange={() => onChange(inputProps.value)}
-        id={inputProps.value}
-        {...inputProps} />
+        id={inputProps.value.toString()}
+        {...inputProps}
+      />
       <label
         className="form-check-label fw-normal"
-        htmlFor={inputProps.id ?? inputProps.value}
+        htmlFor={inputProps.id ?? inputProps.value.toString()}
       >
         {label}
       </label>

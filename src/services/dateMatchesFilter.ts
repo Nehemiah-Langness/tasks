@@ -2,6 +2,7 @@ import { Task } from "../types/SaveFile";
 
 export const dateMatchesFilter = (d: Date, filters: Task["filters"]) => {
   const dayOfMonth = d.getDate();
+  console.log(filters)
   if (filters.date && !filters.date.some((f) => f === dayOfMonth)) {
     return false;
   }

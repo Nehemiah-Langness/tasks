@@ -1,10 +1,12 @@
 import { Task } from "../types/SaveFile";
 import { dateMatchesFilter } from "./dateMatchesFilter";
+import { toDay } from "./toDay";
 
 export function getNextPassingDate(
   date: Date,
   filters: Task["filters"],
-  checkStartDate = false) {
+  checkStartDate = false
+) {
   const incrementDate = (d: Date) => {
     const nextDate = new Date(d.valueOf());
     if (!filters.interval) {
@@ -27,12 +29,14 @@ export function getNextPassingDate(
 
   const isMatch = (d: Date) => dateMatchesFilter(d, filters);
 
-  if (checkStartDate && isMatch(date)) {
+  let nextDate = toDay(date);
+
+  if (checkStartDate && isMatch(nextDate)) {
     return date;
   }
 
   let tries = 0;
-  let nextDate = incrementDate(date);
+  nextDate = incrementDate(date);
   while (tries < 1000 && !isMatch(nextDate)) {
     nextDate = incrementDate(nextDate);
     tries += 1;

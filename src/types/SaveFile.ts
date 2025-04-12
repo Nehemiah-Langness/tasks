@@ -7,14 +7,23 @@ export interface Task {
   id: string;
   description: string;
   lastCompleted?: number;
+  startDate: number;
   filters: {
+    type?: RecurrenceType;
     day?: number[];
     date?: number[];
     month?: number[];
     interval?: {
-      startDate: number;
       step: "day" | "week" | "month" | "year";
       length: number;
     };
   };
+}
+
+export enum RecurrenceType {
+  WeekDay,
+  MonthDay,
+  Daily,
+  IntervalDay,
+  Custom,
 }

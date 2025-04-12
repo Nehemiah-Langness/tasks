@@ -1,13 +1,16 @@
-import { Task } from "../types/SaveFile";
-
+import { RecurrenceType, Task } from "../types/SaveFile";
 
 export function getRecurrenceMode(filters: Task["filters"]) {
+  if (typeof filters.type !== "undefined") {
+    return filters.type;
+  }
+
   if (filters.day?.length) {
-    return "dayOfWeek" as const;
+    return RecurrenceType.WeekDay;
   } else if (filters.date?.length) {
-    return "dayOfMonth" as const;
+    return RecurrenceType.MonthDay;
   } else if (filters.interval?.step === "day") {
-    return "everyDayInterval" as const;
+    return RecurrenceType.IntervalDay;
   }
   return null;
 }

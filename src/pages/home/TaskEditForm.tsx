@@ -1,9 +1,12 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { formatDate } from "../../services/formatDate";
 import { getNextPassingDate } from "../../services/getNextPassingDate";
-import { Task } from "../../types/SaveFile";
+import { RecurrenceType, Task } from "../../types/SaveFile";
 import { getRecurrenceMode } from "../../services/getRecurrenceMode";
 import { Radio } from "../../components/Radio";
+import { toDay } from "../../services/toDay";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCalendarDays } from "@fortawesome/free-regular-svg-icons";
 
 export function TaskEditForm({
   save,
@@ -13,16 +16,18 @@ export function TaskEditForm({
   save: (t: Task) => void;
 }) {
   const [form, setForm] = useState(task);
-  const [recurrenceMode, setRecurrenceMode] = useState<
-    "dayOfWeek" | "dayOfMonth" | "everyDayInterval"
-  >("dayOfWeek");
+  const [recurrenceMode, setRecurrenceMode] = useState<RecurrenceType>(
+    RecurrenceType.Daily
+  );
 
   const [dayOfWeek, setDayOfWeek] = useState(new Date().getDay());
   const [dayOfMonth, setDayOfMonth] = useState(new Date().getDate());
   const [monthInterval, setMonthInterval] = useState(1);
   const [weekInterval, setWeekInterval] = useState(1);
   const [dayInterval, setDayInterval] = useState(1);
-  const [startDate, setStartDate] = useState(new Date().toISOString());
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
 
   const changeForm = useCallback(
     <T extends keyof typeof form>(key: T, value: (typeof form)[T]) => {
@@ -33,67 +38,92 @@ export function TaskEditForm({
 
   useEffect(() => {
     setForm(task);
+    setStartDate(new Date(task.startDate ?? Date.now()).toISOString());
     const mode = getRecurrenceMode(task.filters);
-    if (mode) {
+    if (mode !== null) {
       setRecurrenceMode(mode);
-      if (mode === "dayOfWeek") {
+      if (mode === RecurrenceType.WeekDay) {
         setDayOfWeek(task.filters.day?.[0] ?? 0);
         setWeekInterval(task.filters.interval?.length ?? 1);
-      } else if (mode === "dayOfMonth") {
-        setRecurrenceMode("dayOfMonth");
+      } else if (mode === RecurrenceType.MonthDay) {
         setDayOfMonth(task.filters?.date?.[0] ?? 1);
         setMonthInterval(task.filters.interval?.length ?? 1);
-      } else if (mode === "everyDayInterval") {
+      } else if (mode === RecurrenceType.IntervalDay) {
         setDayInterval(task.filters.interval?.length ?? 1);
-        setStartDate(
-          new Date(task.filters.interval?.startDate ?? Date.now()).toISOString()
-        );
       }
     }
   }, [task]);
+
+  const startDateParsed = useMemo(() => {
+    if (!startDate) return toDay(new Date());
+
+    const utcDate = new Date(startDate);
+    return new Date(
+      utcDate.getUTCFullYear(),
+      utcDate.getUTCMonth(),
+      utcDate.getUTCDate()
+    );
+  }, [startDate]);
+
+  const stageStartDate = useMemo(
+    () =>
+      recurrenceMode === RecurrenceType.MonthDay
+        ? getNextPassingDate(
+            startDateParsed,
+            {
+              date: [dayOfMonth],
+            },
+            true
+          )?.valueOf() ?? 0
+        : recurrenceMode === RecurrenceType.WeekDay
+        ? getNextPassingDate(
+            startDateParsed,
+            {
+              day: [dayOfWeek],
+            },
+            true
+          )?.valueOf() ?? 0
+        : startDateParsed.valueOf(),
+    [dayOfMonth, dayOfWeek, recurrenceMode, startDateParsed]
+  );
 
   const stagedTask = useMemo(() => {
     const newTask: Task = {
       id: task.id,
       description: form.description,
+      startDate: stageStartDate,
       filters:
-        recurrenceMode === "dayOfMonth"
+        recurrenceMode === RecurrenceType.MonthDay
           ? {
+              type: recurrenceMode,
               date: [dayOfMonth],
               interval: {
                 length: monthInterval,
-                startDate:
-                  getNextPassingDate(
-                    new Date(),
-                    {
-                      date: [dayOfMonth],
-                    },
-                    true
-                  )?.valueOf() ?? 0,
                 step: "month",
               },
             }
-          : recurrenceMode === "dayOfWeek"
+          : recurrenceMode === RecurrenceType.WeekDay
           ? {
+              type: recurrenceMode,
               day: [dayOfWeek],
               interval: {
                 length: weekInterval,
-                startDate:
-                  getNextPassingDate(
-                    new Date(),
-                    {
-                      day: [dayOfWeek],
-                    },
-                    true
-                  )?.valueOf() ?? 0,
                 step: "week",
               },
             }
-          : recurrenceMode === "everyDayInterval"
+          : recurrenceMode === RecurrenceType.IntervalDay
           ? {
+              type: recurrenceMode,
               interval: {
                 length: dayInterval,
-                startDate: new Date(startDate).valueOf(),
+                step: "day",
+              },
+            }
+          : recurrenceMode === RecurrenceType.Daily
+          ? {
+              type: recurrenceMode,
+              interval: {
+                length: 1,
                 step: "day",
               },
             }
@@ -108,7 +138,7 @@ export function TaskEditForm({
     form.description,
     monthInterval,
     recurrenceMode,
-    startDate,
+    stageStartDate,
     task.id,
     weekInterval,
   ]);
@@ -130,25 +160,40 @@ export function TaskEditForm({
             <label>Recurrence</label>
             <Radio
               formValue={recurrenceMode}
-              onChange={(e) => setRecurrenceMode(e as typeof recurrenceMode)}
-              value="dayOfWeek"
+              onChange={(e) => setRecurrenceMode(e)}
+              value={RecurrenceType.Daily}
+              label="Daily"
+            />
+            <Radio
+              formValue={recurrenceMode}
+              onChange={(e) => setRecurrenceMode(e)}
+              value={RecurrenceType.IntervalDay}
+              label="Every X Days"
+            />
+            <Radio
+              formValue={recurrenceMode}
+              onChange={(e) => setRecurrenceMode(e)}
+              value={RecurrenceType.WeekDay}
               label="Specific Weekday"
             />
             <Radio
               formValue={recurrenceMode}
-              onChange={(e) => setRecurrenceMode(e as typeof recurrenceMode)}
-              value="dayOfMonth"
+              onChange={(e) => setRecurrenceMode(e)}
+              value={RecurrenceType.MonthDay}
               label="Specific Day of the Month"
             />
-            <Radio
-              formValue={recurrenceMode}
-              onChange={(e) => setRecurrenceMode(e as typeof recurrenceMode)}
-              value="everyDayInterval"
-              label="Daily Interval"
-            />
           </div>
-          {recurrenceMode === "dayOfWeek" ? (
+          {recurrenceMode === RecurrenceType.WeekDay ? (
             <>
+              <div className="form-group">
+                <label>Beginning On</label>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="form-control"
+                />
+              </div>
               <div className="form-group">
                 <label>Weekday</label>
                 <select
@@ -185,8 +230,29 @@ export function TaskEditForm({
                 </div>
               </div>
             </>
-          ) : recurrenceMode === "everyDayInterval" ? (
+          ) : recurrenceMode === RecurrenceType.Daily ? (
             <>
+              <div className="form-group">
+                <label>Beginning On</label>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="form-control"
+                />
+              </div>
+            </>
+          ) : recurrenceMode === RecurrenceType.IntervalDay ? (
+            <>
+              <div className="form-group">
+                <label>Beginning On</label>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="form-control"
+                />
+              </div>
               <div className="form-group">
                 <label>Day Interval</label>
                 <div className="input-group">
@@ -204,6 +270,9 @@ export function TaskEditForm({
                   <span className="input-group-text">Days</span>
                 </div>
               </div>
+            </>
+          ) : recurrenceMode === RecurrenceType.MonthDay ? (
+            <>
               <div className="form-group">
                 <label>Beginning On</label>
                 <input
@@ -213,72 +282,69 @@ export function TaskEditForm({
                   className="form-control"
                 />
               </div>
-            </>
-          ) : recurrenceMode === "dayOfMonth" ? (
-            <>
               <div className="form-group">
-                <div className="form-group">
-                  <label>Day of Month</label>
-                  <input
-                    type="number"
-                    value={dayOfMonth}
-                    onChange={(e) =>
-                      setDayOfMonth(
-                        isNaN(+e.target.value) ? 1 : +e.target.value
-                      )
-                    }
-                    className="form-control"
-                  />
-                </div>
-                <label>Month Interval</label>
-                <div className="input-group">
-                  <span className="input-group-text">Every</span>
-                  <input
-                    type="number"
-                    value={monthInterval}
-                    onChange={(e) =>
-                      setMonthInterval(
-                        isNaN(+e.target.value) ? 1 : +e.target.value
-                      )
-                    }
-                    className="form-control"
-                  />
-                  <span className="input-group-text">Months</span>
-                </div>
+                <label>Day of Month</label>
+                <input
+                  type="number"
+                  value={dayOfMonth}
+                  onChange={(e) =>
+                    setDayOfMonth(isNaN(+e.target.value) ? 1 : +e.target.value)
+                  }
+                  className="form-control"
+                />
+              </div>
+              <label>Month Interval</label>
+              <div className="input-group">
+                <span className="input-group-text">Every</span>
+                <input
+                  type="number"
+                  value={monthInterval}
+                  onChange={(e) =>
+                    setMonthInterval(
+                      isNaN(+e.target.value) ? 1 : +e.target.value
+                    )
+                  }
+                  className="form-control"
+                />
+                <span className="input-group-text">Months</span>
               </div>
             </>
           ) : null}
-
-          <div className="form-group">
-            <label>Preview</label>
-            {(new Array(5).fill(null as Date | null) as (Date | null)[])
-              .reduce(
-                (c) => {
-                  const lastDate = c[c.length - 1];
-                  if (!lastDate) {
-                    return c;
-                  }
-                  return c.concat(
-                    getNextPassingDate(lastDate, stagedTask.filters)
-                  );
-                },
-                [
-                  stagedTask.filters.interval?.startDate
-                    ? new Date(stagedTask.filters.interval?.startDate)
-                    : getNextPassingDate(new Date(), stagedTask.filters),
-                ]
-              )
-              .map((x) =>
-                x ? (
-                  <div>
+        </div>
+      </div>
+      <div className="form-group">
+        <label className="fs-140">Upcoming Schedule</label>
+        <div className="d-flex flex-column gap-2">
+          {(new Array(5).fill(null as Date | null) as (Date | null)[])
+            .reduce(
+              (c) => {
+                const lastDate = c[c.length - 1];
+                if (!lastDate) {
+                  return c;
+                }
+                return c.concat(
+                  getNextPassingDate(lastDate, stagedTask.filters)
+                );
+              },
+              [
+                stagedTask.startDate
+                  ? new Date(stagedTask.startDate)
+                  : getNextPassingDate(new Date(), stagedTask.filters),
+              ]
+            )
+            .map((x) =>
+              x ? (
+                <div className="bg-secondary text-dark py-1 rounded-2 d-flex align-items-center justify-content-center gap-2">
+                  <FontAwesomeIcon icon={faCalendarDays} />
+                  <span>
                     {formatDate(x, {
                       date: true,
                       day: true,
                     })}
-                  </div>
-                ) : null
-              )}
-          </div>
+                  </span>
+                </div>
+              ) : null
+            )}
         </div>
       </div>
       <button className="btn btn-success" onClick={() => save(stagedTask)}>

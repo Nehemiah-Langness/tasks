@@ -10,16 +10,12 @@ import { toDay } from "../../services/toDay";
 export function TaskRow({ task }: { task: Task }) {
   const nextDueDate = useMemo(() => {
     const now = toDay(new Date()).valueOf();
-    let dueDate = getNextPassingDate(
-      toDay(task.filters.interval?.startDate ?? now),
-      task.filters,
-      true
-    );
+    let dueDate = getNextPassingDate(toDay(task.startDate), task.filters, true);
     while (dueDate && dueDate.valueOf() < now) {
       dueDate = getNextPassingDate(dueDate, task.filters);
     }
     return dueDate ? formatDate(dueDate, { date: true, day: true }) : "Never";
-  }, [task.filters]);
+  }, [task.filters, task.startDate]);
   return (
     <div>
       <div className="h5 fw-normal">{task.description}</div>
@@ -34,7 +30,7 @@ export function TaskRow({ task }: { task: Task }) {
           style={{ paddingTop: 2, paddingBottom: 2 }}
           className="bg-danger px-3 fs-80 rounded-pill text-white"
         >
-          Due on {nextDueDate}
+          Next due on {nextDueDate}
         </div>
       </div>
     </div>

@@ -1,8 +1,18 @@
-import { PropsWithChildren, useEffect, useState, useCallback } from "react";
+import {
+  PropsWithChildren,
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import { useToken } from "../../hooks/useToken";
 import { storageApiUrl } from "./storageApiUrl";
 import { SaveFile } from "../../types/SaveFile";
 import { StorageContext } from "./StorageContext";
+import { MAX_DATA_LENGTH_PER_USER } from "./maxSpace";
+import { toDay } from "../../services/toDay";
+import { dateMatchesFilter } from "../../services/dateMatchesFilter";
+import { getNextPassingDate } from "../../services/getNextPassingDate";
 
 export function StorageProvider({ children }: PropsWithChildren<object>) {
   const getToken = useToken();
@@ -50,6 +60,37 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
             tasks: [],
             ...data,
           };
+
+          file.tasks.forEach((t) => {
+            if (typeof t.startDate !== "number") {
+              console.log(
+                t.description,
+                "has no start date",
+                (t.filters?.interval as { startDate: number } | undefined)
+                  ?.startDate ?? toDay(new Date())
+              );
+              t.startDate =
+                (t.filters?.interval as { startDate: number } | undefined)
+                  ?.startDate ?? toDay(new Date()).valueOf();
+            }
+            if (
+              t.filters?.date?.length ||
+              t.filters?.day?.length ||
+              t.filters?.month?.length
+            ) {
+              if (!dateMatchesFilter(new Date(t.startDate), t.filters)) {
+                t.startDate =
+                  getNextPassingDate(
+                    new Date(t.startDate),
+                    {
+                      ...t.filters,
+                      interval: undefined,
+                    },
+                    true
+                  )?.valueOf() ?? toDay(Date.now()).valueOf();
+              }
+            }
+          });
           setData(file);
           return file;
         })
@@ -88,8 +129,9 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
         })
         .then((data: boolean) => {
           if (data) {
-            setData(file);
-            return file;
+            const copy = structuredClone(file);
+            setData(copy);
+            return copy;
           }
           return null;
         })
@@ -101,10 +143,21 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
     [getToken]
   );
 
+  const { spaceLeft, spaceUsed } = useMemo(() => {
+    const spaceUsed = JSON.stringify(data ?? {}).length;
+    const spaceLeft = MAX_DATA_LENGTH_PER_USER - spaceUsed;
+    return {
+      spaceLeft,
+      spaceUsed,
+    };
+  }, [data]);
+
   return (
     <StorageContext.Provider
       value={{
         data,
+        spaceUsed,
+        spaceLeft,
         load,
         save,
       }}
