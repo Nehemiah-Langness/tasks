@@ -2,7 +2,9 @@ import { toDay } from "../../services/toDay";
 import { RecurrenceType, Task } from "../../types/SaveFile";
 import pool from "./tasks.json";
 
-const itemsPerDay = Math.ceil(pool.length / 7);
+const poolCycleTime = 10
+
+const itemsPerDay = Math.ceil(pool.length / poolCycleTime);
 const incrementDate = (d: Date, days: number) => {
   const newDate = toDay(d);
   newDate.setDate(newDate.getDate() + days);
@@ -15,7 +17,11 @@ const taskPool = (pool as [string, number][]).map((x, i) => {
     id: "pool-" + x[1],
     description: x[0],
     filters: {
-      type: RecurrenceType.Daily,
+      type: RecurrenceType.IntervalDay,
+      interval: {
+        length: poolCycleTime,
+        step: "day",
+      },
     },
     startDate: incrementDate(new Date(), Math.floor(i / itemsPerDay)).valueOf(),
   };

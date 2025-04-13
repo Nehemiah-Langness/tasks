@@ -16,7 +16,7 @@ export function Home() {
   const { data, load, spaceLeft, spaceUsed } = useStorage();
   const { open } = useOffCanvas();
 
-  const tasks = useTasks();
+  const tasks = useTasks(true);
 
   useEffect(() => {
     const controller = new AbortController();
