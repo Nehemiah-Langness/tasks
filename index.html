@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -13,8 +13,13 @@
     <meta property="og:image" content="https://n-lang.dev/og.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <script type="module" crossorigin src="/assets/index-Ox8qRZYC.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BueVfHyR.css">
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/notifications.js");
+      }
+    </script>
+    <script type="module" crossorigin src="/assets/index-Bqv9TXt9.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DfnFxhN7.css">
   </head>
   <body>
     <div id="root"></div>
