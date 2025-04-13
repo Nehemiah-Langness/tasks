@@ -10,10 +10,13 @@ import { NewTaskButton } from "./home/NewTaskButton";
 import { Today } from "./home/Today";
 import { TaskEditProvider } from "../contexts/edit-tasks/TaskEditProvider";
 import { TaskRow } from "./home/TaskRow";
+import { useTasks } from "./home/useTasks";
 
 export function Home() {
   const { data, load, spaceLeft, spaceUsed } = useStorage();
   const { open } = useOffCanvas();
+
+  const tasks = useTasks();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -71,8 +74,8 @@ export function Home() {
         <NewTaskButton />
 
         <div className="d-flex flex-column gap-2 px-3">
-          {data.tasks.map((x) => (
-            <TaskRow key={x.id} task={x} />
+          {tasks?.map((x) => (
+            <TaskRow key={x.task.id} task={x.task} dueDate={x.nextDueDate?.valueOf()} />
           ))}
         </div>
       </div>

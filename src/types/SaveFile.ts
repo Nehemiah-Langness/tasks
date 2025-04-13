@@ -1,6 +1,12 @@
 export interface SaveFile {
   date: number;
   tasks: Task[];
+  pool: Pool[];
+}
+
+export interface Pool {
+  id: number;
+  lastCompleted: number;
 }
 
 export interface Task {

@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useStorage } from "../../contexts/storage/useStorage";
 import { formatDate } from "../../services/formatDate";
-import { getNextPassingDate } from "../../services/getNextPassingDate";
 import { toDay } from "../../services/toDay";
 import { Task } from "../../types/SaveFile";
 import { getCriticism, getPraise } from "../../features/praise";
@@ -10,28 +8,14 @@ import {
   faCalendarCheck,
   faCheckSquare,
 } from "@fortawesome/free-solid-svg-icons";
+import { NotificationsButton } from "./NotificationsButton";
+import { useCompleteTask } from "./useCompleteTask";
+import { useTasks } from "./useTasks";
 
 export function Today() {
-  const { data } = useStorage();
   const now = toDay(new Date());
 
-  const tasks = useMemo(
-    () =>
-      data?.tasks
-        .map((t) => {
-          const nextDueDate = getNextPassingDate(
-            new Date(t.startDate),
-            t.filters,
-            true
-          );
-          return { task: t, nextDueDate };
-        })
-        .sort(
-          (a, b) =>
-            (a.nextDueDate?.valueOf() ?? 0) - (b.nextDueDate?.valueOf() ?? 0)
-        ),
-    [data?.tasks]
-  );
+  const tasks = useTasks();
 
   const pastDue = useMemo(
     () =>
@@ -78,6 +62,14 @@ export function Today() {
     setMessage(undefined);
   }, []);
 
+  const tasksCompleted = useMemo(
+    () =>
+      tasks?.filter(
+        (x) => x.task.lastCompleted && x.task.lastCompleted >= now.valueOf()
+      ),
+    [now, tasks]
+  );
+
   return (
     <div>
       {message && (
@@ -87,7 +79,8 @@ export function Today() {
           type={message.type}
         />
       )}
-      <div className="text-center">
+      <div className="d-flex gap-2 justify-content-center align-items-center">
+        <NotificationsButton />
         <span className="fs-140">
           {formatDate(now, {
             day: true,
@@ -98,7 +91,7 @@ export function Today() {
       <div className="d-flex flex-column align-items-start gap-3">
         {dueToday.length ? (
           <div className="list-group">
-            Due Today
+            <span className="fs-140 fw-light">Today's Tasks</span>
             {tasks
               ?.filter(
                 (x) =>
@@ -109,13 +102,35 @@ export function Today() {
                   <TaskRow task={t.task} />
                 </div>
               ))}
+            {!!tasksCompleted?.length && (
+              <div className="list-group-item text-center h5 mb-0 fw-normal bg-success-subtle position-relative overflow-hidden">
+                <AnimatedBackground />
+                <div className="position-relative" style={{ zIndex: 1 }}>
+                  <b>{tasksCompleted.length}</b> task
+                  {tasksCompleted.length === 1 ? "" : "s"} already completed
+                </div>
+              </div>
+            )}
           </div>
         ) : (
-          <div>Your tasks are completed for the day!</div>
+          <div className="px-2 py-4 d-flex justify-content-center align-items-center border border-success align-self-stretch my-3 rounded-2 bg-success-subtle position-relative overflow-hidden">
+            <AnimatedBackground />
+            <div
+              className="fs-150 position-relative text-center"
+              style={{ zIndex: 1 }}
+            >
+              All tasks are completed for the day!
+              {!!tasksCompleted?.length && (
+                <div className="fs-140">
+                  You have finished {tasksCompleted?.length} tasks today!
+                </div>
+              )}
+            </div>
+          </div>
         )}
         {!!pastDue.length && (
           <>
-            Past Due
+            <span className="fs-140 fw-light">Tasks You've Missed</span>
             {pastDue.map((t) => (
               <div>
                 <TaskRow
@@ -129,6 +144,18 @@ export function Today() {
         )}
       </div>
     </div>
+  );
+}
+
+function AnimatedBackground() {
+  return (
+    <div
+      className="animated-background"
+      style={{
+        background:
+          "url(/star-solid.svg) 0 0 /3rem, url(/star-solid.svg) 1.5rem 1.3rem /3rem",
+      }}
+    ></div>
   );
 }
 
@@ -156,31 +183,6 @@ function Message({
       <div>{message}</div>
     </div>
   );
-}
-
-function useCompleteTask(id: string) {
-  const { data, save } = useStorage();
-
-  return useCallback(() => {
-    if (!data) {
-      return;
-    }
-    const t = data.tasks.find((t) => t.id === id);
-    if (!t) {
-      return;
-    }
-    const now = toDay(Date.now());
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    t.lastCompleted = now.valueOf();
-    while (toDay(t.startDate).valueOf() <= now.valueOf()) {
-      t.startDate = toDay(
-        getNextPassingDate(new Date(t.startDate), t.filters) ?? tomorrow
-      ).valueOf();
-    }
-
-    return save(data);
-  }, [data, id, save]);
 }
 
 export function TaskRow({

@@ -58,6 +58,7 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
           const file: SaveFile = {
             date: Date.now(),
             tasks: [],
+            pool: [],
             ...data,
           };
 
@@ -104,6 +105,7 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
 
   const save = useCallback(
     (file: SaveFile, signal?: AbortSignal) => {
+      file.date = Date.now();
       return getToken()
         .then((token) => {
           if (!token) {

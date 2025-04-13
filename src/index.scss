@@ -20,6 +20,9 @@ body,
 .fs-140 {
   font-size: 1.4rem !important;
 }
+.fs-150 {
+  font-size: 1.5rem !important;
+}
 .fs-200 {
   font-size: 2rem !important;
 }
@@ -104,10 +107,12 @@ body,
   }
 
   .from {
+    pointer-events: none;
     animation: task-completed-from 1s ease-in-out forwards;
     z-index: 1;
   }
   .to {
+    pointer-events: none;
     animation: task-completed-to 0.5s ease-in-out forwards;
     z-index: 2;
   }
@@ -132,5 +137,20 @@ body,
   100% {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+.animated-background {
+  position: absolute;
+  inset: -100% 0 -100% 0;
+  animation: animated-background 3s linear infinite;
+}
+
+@keyframes animated-background {
+  from {
+    top: -100%;
+  }
+  to {
+    top: 0%;
   }
 }

@@ -1,7 +1,7 @@
 import { PropsWithChildren, useState, useCallback, useEffect } from "react";
 import { useOffCanvas } from "../offcanvas/useOffCanvas";
 import { useStorage } from "../storage/useStorage";
-import { Task } from "../../types/SaveFile";
+import { RecurrenceType, Task } from "../../types/SaveFile";
 import { TaskEditContext } from "./TaskEditContext";
 import { TaskEditForm } from "../../pages/home/TaskEditForm";
 import { toDay } from "../../services/toDay";
@@ -18,7 +18,7 @@ export function TaskEditProvider({ children }: PropsWithChildren) {
       id: crypto.randomUUID(),
       startDate: toDay(new Date()).valueOf(),
       filters: {
-        day: [new Date().getDay()],
+        type: RecurrenceType.Daily,
       },
     });
   }, [setTitle]);

@@ -38,7 +38,9 @@ export function TaskEditForm({
 
   useEffect(() => {
     setForm(task);
-    setStartDate(new Date(task.startDate ?? Date.now()).toISOString());
+    setStartDate(
+      new Date(task.startDate ?? Date.now()).toISOString().split("T")[0]
+    );
     const mode = getRecurrenceMode(task.filters);
     if (mode !== null) {
       setRecurrenceMode(mode);
@@ -89,7 +91,7 @@ export function TaskEditForm({
 
   const stagedTask = useMemo(() => {
     const newTask: Task = {
-      id: task.id,
+      ...task,
       description: form.description,
       startDate: stageStartDate,
       filters:
@@ -139,7 +141,7 @@ export function TaskEditForm({
     monthInterval,
     recurrenceMode,
     stageStartDate,
-    task.id,
+    task,
     weekInterval,
   ]);
 
