@@ -1,24 +1,24 @@
-self.addEventListener("install", () => console.log("ServiceWorker installed"));
+self.addEventListener("install", () => self.skipWaiting());
 
 self.addEventListener("push", function (event) {
-  const data = event.data?.text() ?? '';
-  console.log("Received a push message", event, data);
+  const data = event.data?.json() ?? {};
+  console.log("Received a push message", data);
 
   if (!(self.Notification && self.Notification.permission === "granted")) {
     return;
   }
 
-  var title = "Yay a message.";
-  var body = data;
-  var icon = "/192.png";
-  var tag = "simple-push-demo-notification-tag";
+  const title = data.title ?? "You have tasks due";
+  const body = data.body ?? "Open tasks.n-lang.dev to view them";
+  const icon = "/favicon.svg";
+  const tag = new Date().valueOf().toFixed();
 
   event.waitUntil(
     self.registration.showNotification(title, {
       body: body,
       icon: icon,
       badge: icon,
-      image: "/bg.png",
+      image: "/tasks-due.jpeg",
       tag: tag,
       renotify: true,
     })
