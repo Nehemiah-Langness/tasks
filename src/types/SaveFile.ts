@@ -2,6 +2,13 @@ export interface SaveFile {
   date: number;
   tasks: Task[];
   pool: Pool[];
+  subscription?: {
+    endpoint: string;
+    keys: {
+      auth: string;
+      p256dh: string;
+    };
+  };
 }
 
 export interface Pool {
