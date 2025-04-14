@@ -55,6 +55,12 @@ export function TaskRow({ task, dueDate }: { task: Task; dueDate?: number }) {
         >
           <FontAwesomeIcon icon={faRepeat} /> {describeFilter(task.filters)}
         </div>
+        {task.lastCompleted && <div
+          style={{ paddingTop: 2, paddingBottom: 2 }}
+          className="bg-success px-3 fs-80 rounded-pill text-white"
+        >
+          {task.lastCompleted}
+        </div>}
         <div
           style={{ paddingTop: 2, paddingBottom: 2 }}
           className="bg-danger px-3 fs-80 rounded-pill text-white"
