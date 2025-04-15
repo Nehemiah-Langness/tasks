@@ -104,7 +104,9 @@ export class Dates {
         } else if (interval === 'week') {
             dateObject.setUTCDate(dateObject.getUTCDate() + amount * 7);
         } else if (interval === 'month') {
-            dateObject.setUTCMonth(dateObject.getUTCMonth() + amount * 7);
+            dateObject.setUTCMonth(dateObject.getUTCMonth() + amount);
+        } else if (interval === 'year') {
+            dateObject.setUTCFullYear(dateObject.getUTCFullYear() + amount);
         }
 
         return dateObject;
