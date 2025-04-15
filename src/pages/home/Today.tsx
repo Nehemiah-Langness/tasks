@@ -68,7 +68,7 @@ export function Today() {
                         {tasks
                             ?.filter((x) => x.nextDueDate && x.nextDueDate.valueOf() === now.valueOf())
                             .map((t) => (
-                                <div className='list-group-item'>
+                                <div key={t.task.id} className='list-group-item'>
                                     <TaskRow task={t.task} />
                                 </div>
                             ))}
@@ -97,7 +97,7 @@ export function Today() {
                     <div className='list-group'>
                         <span className='fs-140 fw-light'>Tasks You've Missed</span>
                         {pastDue.map((t) => (
-                            <div className='list-group-item'>
+                            <div key={t.task.id} className='list-group-item'>
                                 <TaskRow task={t.task} pastDue dueDate={t.nextDueDate?.valueOf()} />
                             </div>
                         ))}
