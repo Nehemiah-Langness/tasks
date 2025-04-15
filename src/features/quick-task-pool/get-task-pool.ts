@@ -1,20 +1,15 @@
-import { toDay } from '../../services/toDay';
+import { Dates } from '../../services/dates';
 import { RecurrenceType, Task } from '../../types/SaveFile';
 import pool from './tasks.json';
-
-const incrementDate = (d: Date, days: number) => {
-    const newDate = new Date(d);
-    newDate.setDate(newDate.getDate() + days);
-    return newDate;
-};
 
 function createTasks(poolCycleTime = 10, daysInCycle = 0) {
     const itemsPerDay = Math.ceil(pool.length / poolCycleTime);
 
-    const baseDay = toDay(new Date());
-    baseDay.setDate(baseDay.getDate() - daysInCycle);
+    const baseDay = Dates.increment(Dates.today(), -daysInCycle, 'day');
 
     return (pool as [string, number][]).map((x, i) => {
+        const dueDate = Dates.increment(baseDay, Math.floor(i / itemsPerDay), 'day').valueOf();
+
         const task: Task & { poolId: number } = {
             poolId: x[1],
             id: 'pool-' + x[1],
@@ -26,7 +21,8 @@ function createTasks(poolCycleTime = 10, daysInCycle = 0) {
                     step: 'day',
                 },
             },
-            startDate: incrementDate(baseDay, Math.floor(i / itemsPerDay)).valueOf(),
+            startDate: dueDate,
+            dueDate: dueDate,
         };
 
         return task;
@@ -37,6 +33,6 @@ export function getTaskPool(all = false, poolCycleTime = 10, daysInCycle = 0) {
     const taskPool = createTasks(poolCycleTime, daysInCycle);
 
     if (all) return taskPool;
-    const now = toDay(new Date()).valueOf();
+    const now = Dates.today().valueOf();
     return taskPool.filter((x) => x.startDate === now);
 }

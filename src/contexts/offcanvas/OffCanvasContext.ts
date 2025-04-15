@@ -2,6 +2,7 @@ import React from "react";
 
 
 export const OffCanvasContext = React.createContext<{
+  isOpen: boolean;
   open: () => void;
   close: () => void;
   ref: React.Ref<HTMLDivElement>;
@@ -10,6 +11,7 @@ export const OffCanvasContext = React.createContext<{
   Title: React.ReactNode;
   Content: React.ReactNode;
 }>({
+  isOpen: false,
   close: () => { },
   open: () => { },
   ref: { current: null },

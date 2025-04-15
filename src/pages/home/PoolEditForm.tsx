@@ -1,6 +1,7 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { formatDate } from '../../services/formatDate';
 import { PoolConfiguration } from '../../types/SaveFile';
+import { DateInput } from '../../components/DateInput';
 
 export function PoolEditForm({ save, poolConfiguration }: { poolConfiguration: PoolConfiguration; save: (t: PoolConfiguration) => void }) {
     const [form, setForm] = useState(poolConfiguration);
@@ -13,30 +14,13 @@ export function PoolEditForm({ save, poolConfiguration }: { poolConfiguration: P
         setForm(poolConfiguration);
     }, [poolConfiguration]);
 
-    const startDateParsed = useMemo(() => {
-        const utcDate = form.startDate ? new Date(form.startDate) : new Date();
-        return new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate()).toISOString().split('T')[0];
-    }, [form.startDate]);
-
-    const setDate = useCallback(
-        (date: Date) => {
-            changeForm('startDate', new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()).valueOf());
-        },
-        [changeForm]
-    );
-
     return (
         <div className='d-flex flex-column h-100 gap-2'>
             <div className='flex-grow-1'>
                 <div className='form'>
                     <div className='form-group'>
                         <label>Beginning On</label>
-                        <input
-                            type='date'
-                            value={startDateParsed}
-                            onChange={(e) => (e.target.valueAsDate ? setDate(e.target.valueAsDate) : null)}
-                            className='form-control'
-                        />
+                        <DateInput value={form.startDate} setValue={(v) => changeForm('startDate', v)} />
                     </div>
 
                     <div className='form-group'>

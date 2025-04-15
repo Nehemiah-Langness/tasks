@@ -4,11 +4,11 @@ import { useStorage } from '../storage/useStorage';
 import { RecurrenceType, Task } from '../../types/SaveFile';
 import { TaskEditContext } from './TaskEditContext';
 import { TaskEditForm } from '../../pages/home/TaskEditForm';
-import { toDay } from '../../services/toDay';
+import { Dates } from '../../services/dates';
 
 export function TaskEditProvider({ children }: PropsWithChildren) {
     const [task, setTask] = useState<Task>();
-    const { open, close, setContent, setTitle } = useOffCanvas();
+    const { open, close, setContent, setTitle, isOpen } = useOffCanvas();
     const { data, save: saveData } = useStorage();
 
     const create = useCallback(() => {
@@ -16,7 +16,8 @@ export function TaskEditProvider({ children }: PropsWithChildren) {
         setTask({
             description: '',
             id: crypto.randomUUID(),
-            startDate: toDay(new Date()).valueOf(),
+            startDate: Dates.today().valueOf(),
+            dueDate: Dates.today().valueOf(),
             filters: {
                 type: RecurrenceType.Daily,
             },
@@ -47,11 +48,18 @@ export function TaskEditProvider({ children }: PropsWithChildren) {
 
     const load = useCallback(
         (task: Task) => {
+            console.log('Setting Task');
             setTitle('Edit Task');
             setTask(task);
         },
         [setTitle]
     );
+
+    useEffect(() => {
+        if (!isOpen) {
+            setTask(undefined);
+        }
+    }, [isOpen]);
 
     useEffect(() => {
         if (task) {

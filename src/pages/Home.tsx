@@ -74,7 +74,7 @@ export function Home() {
 
                 <div className='d-flex flex-column gap-2 px-3'>
                     {tasks?.map((x) => (
-                        <TaskRow key={x.task.id} task={x.task} dueDate={x.nextDueDate?.valueOf()} />
+                        <TaskRow key={x.id} task={x} />
                     ))}
                 </div>
             </div>

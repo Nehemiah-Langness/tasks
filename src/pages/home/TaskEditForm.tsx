@@ -1,23 +1,22 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { formatDate } from '../../services/formatDate';
-import { getNextPassingDate } from '../../services/getNextPassingDate';
 import { RecurrenceType, Task } from '../../types/SaveFile';
 import { getRecurrenceMode } from '../../services/getRecurrenceMode';
 import { Radio } from '../../components/Radio';
-import { toDay } from '../../services/toDay';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDays } from '@fortawesome/free-regular-svg-icons';
+import { Dates, Tasks } from '../../services/dates';
+import { DateInput } from '../../components/DateInput';
 
 export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => void }) {
     const [form, setForm] = useState(task);
     const [recurrenceMode, setRecurrenceMode] = useState<RecurrenceType>(RecurrenceType.Daily);
 
-    const [dayOfWeek, setDayOfWeek] = useState(new Date().getDay());
-    const [dayOfMonth, setDayOfMonth] = useState(new Date().getDate());
+    const [dayOfWeek, setDayOfWeek] = useState(Dates.today().getUTCDay());
+    const [dayOfMonth, setDayOfMonth] = useState(Dates.today().getUTCDate());
     const [monthInterval, setMonthInterval] = useState(1);
     const [weekInterval, setWeekInterval] = useState(1);
     const [dayInterval, setDayInterval] = useState(1);
-    const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
 
     const changeForm = useCallback(<T extends keyof typeof form>(key: T, value: (typeof form)[T]) => {
         setForm((x) => ({ ...x, [key]: value }));
@@ -25,7 +24,6 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
 
     useEffect(() => {
         setForm(task);
-        setStartDate(new Date(task.startDate ?? Date.now()).toISOString().split('T')[0]);
         const mode = getRecurrenceMode(task.filters);
         if (mode !== null) {
             setRecurrenceMode(mode);
@@ -41,33 +39,18 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
         }
     }, [task]);
 
-    const startDateParsed = useMemo(() => {
-        if (!startDate) return toDay(new Date());
-
-        const utcDate = new Date(startDate);
-        return new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate());
-    }, [startDate]);
-
     const stageStartDate = useMemo(
         () =>
             recurrenceMode === RecurrenceType.MonthDay
-                ? getNextPassingDate(
-                      startDateParsed,
-                      {
-                          date: [dayOfMonth],
-                      },
-                      true
-                  )?.valueOf() ?? 0
+                ? Tasks.nextDueDate(form.startDate, {
+                      date: [dayOfMonth],
+                  })?.valueOf() ?? 0
                 : recurrenceMode === RecurrenceType.WeekDay
-                ? getNextPassingDate(
-                      startDateParsed,
-                      {
-                          day: [dayOfWeek],
-                      },
-                      true
-                  )?.valueOf() ?? 0
-                : startDateParsed.valueOf(),
-        [dayOfMonth, dayOfWeek, recurrenceMode, startDateParsed]
+                ? Tasks.nextDueDate(form.startDate, {
+                      day: [dayOfWeek],
+                  })?.valueOf() ?? 0
+                : form.startDate,
+        [dayOfMonth, dayOfWeek, form.startDate, recurrenceMode]
     );
 
     const stagedTask = useMemo(() => {
@@ -112,6 +95,8 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
                       }
                     : {},
         };
+
+        console.log(new Date(task.startDate), new Date(task.dueDate), task.lastCompleted ? new Date(task.lastCompleted) : null);
 
         return newTask;
     }, [dayInterval, dayOfMonth, dayOfWeek, form.description, monthInterval, recurrenceMode, stageStartDate, task, weekInterval]);
@@ -160,12 +145,7 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
                         <>
                             <div className='form-group'>
                                 <label>Beginning On</label>
-                                <input
-                                    type='date'
-                                    value={startDate}
-                                    onChange={(e) => setStartDate(e.target.value)}
-                                    className='form-control'
-                                />
+                                <DateInput value={form.startDate} setValue={(v) => changeForm('startDate', v)} />
                             </div>
                             <div className='form-group'>
                                 <label>Weekday</label>
@@ -201,24 +181,14 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
                         <>
                             <div className='form-group'>
                                 <label>Beginning On</label>
-                                <input
-                                    type='date'
-                                    value={startDate}
-                                    onChange={(e) => setStartDate(e.target.value)}
-                                    className='form-control'
-                                />
+                                <DateInput value={form.startDate} setValue={(v) => changeForm('startDate', v)} />
                             </div>
                         </>
                     ) : recurrenceMode === RecurrenceType.IntervalDay ? (
                         <>
                             <div className='form-group'>
                                 <label>Beginning On</label>
-                                <input
-                                    type='date'
-                                    value={startDate}
-                                    onChange={(e) => setStartDate(e.target.value)}
-                                    className='form-control'
-                                />
+                                <DateInput value={form.startDate} setValue={(v) => changeForm('startDate', v)} />
                             </div>
                             <div className='form-group'>
                                 <label>Day Interval</label>
@@ -238,12 +208,7 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
                         <>
                             <div className='form-group'>
                                 <label>Beginning On</label>
-                                <input
-                                    type='date'
-                                    value={startDate}
-                                    onChange={(e) => setStartDate(e.target.value)}
-                                    className='form-control'
-                                />
+                                <DateInput value={form.startDate} setValue={(v) => changeForm('startDate', v)} />
                             </div>
                             <div className='form-group'>
                                 <label>Day of Month</label>
@@ -279,23 +244,24 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
                                 if (!lastDate) {
                                     return c;
                                 }
-                                return c.concat(getNextPassingDate(lastDate, stagedTask.filters));
+                                return c.concat(Tasks.nextDueDate(lastDate, stagedTask.filters, Dates.increment(lastDate, 1, 'day')));
                             },
-                            [stagedTask.startDate ? new Date(stagedTask.startDate) : getNextPassingDate(new Date(), stagedTask.filters)]
+                            [stagedTask.startDate ? new Date(stagedTask.startDate) : Tasks.nextDueDate(Dates.today(), stagedTask.filters)]
                         )
                         .map((x, i) =>
-                            x ? (<>
-                                <div key={x.valueOf()} className='d-flex align-items-center gap-2 px-2'>
-                                    <FontAwesomeIcon icon={faCalendarDays} />
-                                    <span>
-                                        {formatDate(x, {
-                                            date: true,
-                                            day: true,
-                                        })}
-                                    </span>
-                                    <div></div>
-                                </div>
-                                {i < 4 && <div key={'div' + x.valueOf()} className='border-bottom'></div>}
+                            x ? (
+                                <>
+                                    <div key={x.valueOf()} className='d-flex align-items-center gap-2 px-2'>
+                                        <FontAwesomeIcon icon={faCalendarDays} />
+                                        <span>
+                                            {formatDate(x, {
+                                                date: true,
+                                                day: true,
+                                            })}
+                                        </span>
+                                        <div></div>
+                                    </div>
+                                    {i < 4 && <div key={'div' + x.valueOf()} className='border-bottom'></div>}
                                 </>
                             ) : null
                         )}

@@ -4,9 +4,7 @@ import { storageApiUrl } from './storageApiUrl';
 import { SaveFile } from '../../types/SaveFile';
 import { StorageContext } from './StorageContext';
 import { MAX_DATA_LENGTH_PER_USER } from './maxSpace';
-import { toDay } from '../../services/toDay';
-import { dateMatchesFilter } from '../../services/dateMatchesFilter';
-import { getNextPassingDate } from '../../services/getNextPassingDate';
+import { Dates, Tasks } from '../../services/dates';
 
 export function StorageProvider({ children }: PropsWithChildren<object>) {
     const getToken = useToken();
@@ -28,11 +26,13 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
 
     const load = useCallback(
         (signal?: AbortSignal) => {
+            let validToken = '';
             return getToken()
                 .then((token) => {
                     if (!token) {
                         throw new Error('No Token');
                     }
+                    validToken = token;
                     return fetch(storageApiUrl, {
                         headers: {
                             Authorization: token,
@@ -48,7 +48,7 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
                         throw new Error('Unable to save');
                     }
                 })
-                .then((data: Partial<SaveFile>) => {
+                .then(async (data: Partial<SaveFile>) => {
                     const file: SaveFile = {
                         date: Date.now(),
                         tasks: [],
@@ -56,35 +56,25 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
                         poolConfiguration: {
                             cycleSize: 10,
                             disabledTasks: [],
-                            startDate: toDay(Date.now()).valueOf(),
+                            startDate: Dates.today().valueOf(),
                         },
                         ...data,
                     };
 
                     file.tasks.forEach((t) => {
-                        if (typeof t.startDate !== 'number') {
-                            console.log(
-                                t.description,
-                                'has no start date',
-                                (t.filters?.interval as { startDate: number } | undefined)?.startDate ?? toDay(new Date())
-                            );
-                            t.startDate =
-                                (t.filters?.interval as { startDate: number } | undefined)?.startDate ?? toDay(new Date()).valueOf();
-                        }
-                        if (t.filters?.date?.length || t.filters?.day?.length || t.filters?.month?.length) {
-                            if (!dateMatchesFilter(new Date(t.startDate), t.filters)) {
-                                t.startDate =
-                                    getNextPassingDate(
-                                        new Date(t.startDate),
-                                        {
-                                            ...t.filters,
-                                            interval: undefined,
-                                        },
-                                        true
-                                    )?.valueOf() ?? toDay(Date.now()).valueOf();
-                            }
-                        }
+                        Tasks.normalize(t);
                     });
+
+                    await fetch(storageApiUrl, {
+                        method: 'POST',
+                        body: JSON.stringify(file),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: validToken,
+                        },
+                        signal,
+                    });
+
                     setData(file);
                     return file;
                 })
@@ -99,6 +89,9 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
     const save = useCallback(
         (file: SaveFile, signal?: AbortSignal) => {
             file.date = Date.now();
+            file.tasks.forEach((t) => {
+                Tasks.normalize(t);
+            });
             return getToken()
                 .then((token) => {
                     if (!token) {

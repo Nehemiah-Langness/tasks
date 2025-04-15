@@ -1,36 +1,45 @@
 import { useMemo } from 'react';
 import { useStorage } from '../../contexts/storage/useStorage';
 import { getTaskPool } from '../../features/quick-task-pool/get-task-pool';
-import { getNextPassingDate } from '../../services/getNextPassingDate';
-import { toDay } from '../../services/toDay';
-import { daysBetween } from '../../services/daysBetween';
+import { Dates, Tasks } from '../../services/dates';
 
 export function useTasks(allPool = false) {
     const { data } = useStorage();
     return useMemo(
         () =>
             data?.tasks
-                .map((t) => {
-                    const nextDueDate = getNextPassingDate(new Date(t.startDate), t.filters, true);
-                    return { task: t, nextDueDate };
-                })
                 .concat(
                     getTaskPool(
                         allPool,
                         data.poolConfiguration.cycleSize,
-                        daysBetween(data.poolConfiguration.startDate, toDay(new Date()))
+                        Dates.daysBetween(data.poolConfiguration.startDate, Dates.today())
                     ).map((x) => {
                         x.lastCompleted = data.pool.find((p) => p.id === x.poolId)?.lastCompleted;
-                        return {
-                            task: x,
-                            nextDueDate:
-                                x.lastCompleted && x.lastCompleted >= x.startDate
-                                    ? getNextPassingDate(new Date(x.lastCompleted), x.filters)
-                                    : new Date(x.startDate),
-                        };
+                        x.dueDate = (
+                            Tasks.nextDueDate(
+                                x.startDate,
+                                x.filters,
+                                x.lastCompleted ? Dates.increment(x.lastCompleted, 1, 'day') : undefined
+                            ) ?? Dates.today()
+                        ).valueOf();
+                        return x;
                     })
                 )
-                .sort((a, b) => (a.nextDueDate?.valueOf() ?? 0) - (b.nextDueDate?.valueOf() ?? 0)),
+                .sort((a, b) =>
+                    a.dueDate < b.dueDate
+                        ? -1
+                        : a.dueDate > b.dueDate
+                        ? 1
+                        : (a.lastCompleted ?? 0) < (b.lastCompleted ?? 0)
+                        ? -1
+                        : (a.lastCompleted ?? 0) > (b.lastCompleted ?? 0)
+                        ? 1
+                        : a.description < b.description
+                        ? -1
+                        : a.description > b.description
+                        ? 1
+                        : 0
+                ),
         [allPool, data?.pool, data?.poolConfiguration.cycleSize, data?.poolConfiguration.startDate, data?.tasks]
     );
 }

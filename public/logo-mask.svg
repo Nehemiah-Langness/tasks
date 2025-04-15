@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 192 192">
+  <!-- Generator: Adobe Illustrator 29.4.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 152)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #fff;
+      }
+
+      .st1 {
+        mask: url(#mask);
+      }
+
+      .st2 {
+        fill: #2272af;
+      }
+
+      .st3 {
+        display: none;
+      }
+
+      .st4 {
+        fill: url(#linear-gradient);
+      }
+    </style>
+    <mask id="mask" x="-288" y="-96" width="768" height="384" maskUnits="userSpaceOnUse">
+      <g id="Swipe">
+        <g>
+          <path class="st0" d="M97.6,165.8h0c-.9,3.4-4.5,6.3-7.9,6.3H22.9c-6.3,0-10-5.3-8.4-11.7L48.2,26.2c.9-3.4,4.5-6.3,7.9-6.3h13.5c3.4,0,5.6,2.8,4.8,6.3l-30.6,121.6c-1.6,6.5,2.1,11.7,8.4,11.7h40.8c3.4,0,5.4,2.9,4.6,6.3Z"/>
+          <path class="st0" d="M154.3,137.4l-.7,2.8c-.6,2.4-2,4.8-3.9,6.5-.2.2-.4.3-.6.5-1.2,1-2.4,1.7-3.8,2.3h-.1c-3,1.1-6,.3-7.4-1.8l-34.1-52.5c-.8-1.2-3-.4-3.4,1.2l-12.5,50c-.6,2.2-2.8,4-5.1,4h-26c-2.2,0-3.5-1.8-3-4l23.2-92.3.8-3.2c.6-2.4,1.9-4.6,3.7-6.3.2-.2.4-.3.6-.5,1.2-1,2.5-1.8,3.9-2.4h0c2.9-1.2,5.8-.4,7.2,1.7l42.5,65.5c.8,1.2,3,.4,3.4-1.2l15.9-62.9c.6-2.2,2.8-4,5.1-4h14.6c2.2,0,3.5,1.8,3,4l-23.4,92.6Z"/>
+        </g>
+      </g>
+    </mask>
+    <linearGradient id="linear-gradient" x1="-96" y1="98" x2="288" y2="98" gradientTransform="translate(0 194) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2272af"/>
+      <stop offset=".2" stop-color="#2473b0"/>
+      <stop offset=".3" stop-color="#2b78b2"/>
+      <stop offset=".3" stop-color="#367fb6"/>
+      <stop offset=".3" stop-color="#478abd"/>
+      <stop offset=".4" stop-color="#5d98c5"/>
+      <stop offset=".4" stop-color="#79a9ce"/>
+      <stop offset=".4" stop-color="#99beda"/>
+      <stop offset=".5" stop-color="#bfd6e8"/>
+      <stop offset=".5" stop-color="#e8f0f7"/>
+      <stop offset=".5" stop-color="#fff"/>
+      <stop offset=".5" stop-color="#e8f0f7"/>
+      <stop offset=".5" stop-color="#bfd6e8"/>
+      <stop offset=".6" stop-color="#99beda"/>
+      <stop offset=".6" stop-color="#79a9ce"/>
+      <stop offset=".6" stop-color="#5d98c5"/>
+      <stop offset=".7" stop-color="#478abd"/>
+      <stop offset=".7" stop-color="#367fb6"/>
+      <stop offset=".7" stop-color="#2b78b2"/>
+      <stop offset=".8" stop-color="#2473b0"/>
+      <stop offset="1" stop-color="#2272af"/>
+    </linearGradient>
+  </defs>
+  <g class="st1">
+    <g id="Swipe1" data-name="Swipe" class="st3">
+      <rect class="st2" x="-288" y="-96" width="768" height="384"/>
+      <rect class="st4" x="-96" y="-96" width="384" height="384"/>
+    </g>
+  </g>
+  <g>
+    <path class="st2" d="M97.6,165.8h0c-.9,3.4-4.5,6.3-7.9,6.3H22.9c-6.3,0-10-5.3-8.4-11.7L48.2,26.2c.9-3.4,4.5-6.3,7.9-6.3h13.5c3.4,0,5.6,2.8,4.8,6.3l-30.6,121.6c-1.6,6.5,2.1,11.7,8.4,11.7h40.8c3.4,0,5.4,2.9,4.6,6.3Z"/>
+    <path class="st2" d="M154.3,137.4l-.7,2.8c-.6,2.4-2,4.8-3.9,6.5-.2.2-.4.3-.6.5-1.2,1-2.4,1.7-3.8,2.3h-.1c-3,1.1-6,.3-7.4-1.8l-34.1-52.5c-.8-1.2-3-.4-3.4,1.2l-12.5,50c-.6,2.2-2.8,4-5.1,4h-26c-2.2,0-3.5-1.8-3-4l23.2-92.3.8-3.2c.6-2.4,1.9-4.6,3.7-6.3.2-.2.4-.3.6-.5,1.2-1,2.5-1.8,3.9-2.4h0c2.9-1.2,5.8-.4,7.2,1.7l42.5,65.5c.8,1.2,3,.4,3.4-1.2l15.9-62.9c.6-2.2,2.8-4,5.1-4h14.6c2.2,0,3.5,1.8,3,4l-23.4,92.6Z"/>
+  </g>
+</svg>

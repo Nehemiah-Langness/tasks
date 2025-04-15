@@ -28,6 +28,7 @@ export interface Task {
     description: string;
     lastCompleted?: number;
     startDate: number;
+    dueDate: number;
     filters: {
         type?: RecurrenceType;
         day?: number[];
