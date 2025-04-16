@@ -42,7 +42,7 @@ export function Today() {
 
     return (
         <>
-            {data?.streak.days && (
+            {!!data?.streak.days && (
                 <div className='streak'>
                     <div className='position-absolute'>
                         <FontAwesomeIcon icon={faFire} />
