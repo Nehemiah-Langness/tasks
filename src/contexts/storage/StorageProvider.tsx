@@ -1,10 +1,10 @@
 import { PropsWithChildren, useEffect, useState, useCallback, useMemo } from 'react';
 import { useToken } from '../../hooks/useToken';
 import { storageApiUrl } from './storageApiUrl';
-import { SaveFile } from '../../types/SaveFile';
+import { SaveFile, Task } from '../../types/SaveFile';
 import { StorageContext } from './StorageContext';
 import { MAX_DATA_LENGTH_PER_USER } from './maxSpace';
-import { Dates, Tasks } from '../../services/dates';
+import { Tasks } from '../../services/dates';
 
 export function StorageProvider({ children }: PropsWithChildren<object>) {
     const getToken = useToken();
@@ -22,7 +22,8 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
         };
     }, []);
 
-    const [data, setData] = useState<SaveFile | null | undefined>();
+    const [taskPool, setTaskPool] = useState<Task[] | null>();
+    const [data, setData] = useState<SaveFile | null>();
 
     const load = useCallback(
         (signal?: AbortSignal) => {
@@ -48,26 +49,14 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
                         throw new Error('Unable to save');
                     }
                 })
-                .then(async (data: Partial<SaveFile>) => {
-                    const file: SaveFile = {
-                        date: Date.now(),
-                        tasks: [],
-                        pool: [],
-                        poolConfiguration: {
-                            cycleSize: 10,
-                            disabledTasks: [],
-                            startDate: Dates.today().valueOf(),
-                        },
-                        ...data,
-                    };
-
-                    file.tasks.forEach((t) => {
+                .then(async (result: { data: SaveFile; pool: Task[] }) => {
+                    result.data.tasks.forEach((t) => {
                         Tasks.normalize(t);
                     });
 
                     await fetch(storageApiUrl, {
                         method: 'POST',
-                        body: JSON.stringify(file),
+                        body: JSON.stringify(result.data),
                         headers: {
                             'Content-Type': 'application/json',
                             Authorization: validToken,
@@ -75,11 +64,14 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
                         signal,
                     });
 
-                    setData(file);
-                    return file;
+                    setData(result.data);
+                    setTaskPool(result.pool);
+                    return result.data;
                 })
                 .catch((er) => {
                     console.error(er);
+                    setData(null);
+                    setTaskPool(null);
                     return null;
                 });
         },
@@ -115,16 +107,15 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
                         throw new Error('Unable to save');
                     }
                 })
-                .then((data: boolean) => {
-                    if (data) {
-                        const copy = structuredClone(file);
-                        setData(copy);
-                        return copy;
-                    }
-                    return null;
+                .then(async (result: { data: SaveFile; pool: Task[] }) => {
+                    setData(result.data);
+                    setTaskPool(result.pool);
+                    return result.data;
                 })
                 .catch((er) => {
                     console.error(er);
+                    setData(null);
+                    setTaskPool(null);
                     return null;
                 });
         },
@@ -144,6 +135,7 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
         <StorageContext.Provider
             value={{
                 data,
+                taskPool,
                 spaceUsed,
                 spaceLeft,
                 load,

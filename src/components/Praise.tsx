@@ -7,7 +7,7 @@ import { Message } from '../pages/home/Today';
 export function Praise() {
     const now = Dates.today().valueOf();
 
-    const tasks = useTasks(true);
+    const tasks = useTasks();
     const tasksLoaded = !!tasks;
     const pastDue = useMemo(() => tasks?.filter((x) => !x.dueDate || x.dueDate < now) ?? [], [now, tasks]);
     const dueToday = useMemo(() => tasks?.filter((x) => x.dueDate && x.dueDate === now) ?? [], [now, tasks]);

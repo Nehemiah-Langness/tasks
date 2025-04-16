@@ -11,7 +11,7 @@ import { Dates } from '../../services/dates';
 export function Today() {
     const now = Dates.today().valueOf();
     const tomorrow = Dates.increment(now, 1, 'day').valueOf();
-    const tasks = useTasks(true);
+    const tasks = useTasks();
 
     const pastDue = useMemo(() => tasks?.filter((x) => !x.dueDate || x.dueDate < now) ?? [], [now, tasks]);
     const dueToday = useMemo(() => tasks?.filter((x) => x.dueDate && x.dueDate === now) ?? [], [now, tasks]);

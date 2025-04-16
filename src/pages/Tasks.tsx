@@ -13,7 +13,7 @@ import { Link } from 'react-router';
 
 export function Tasks() {
     const { data, spaceLeft, spaceUsed } = useStorage();
-    const tasks = useTasks(true);
+    const tasks = useTasks();
     const spaceRemaining = (spaceUsed * 100) / (spaceLeft + spaceUsed);
 
     if (data === null) {
