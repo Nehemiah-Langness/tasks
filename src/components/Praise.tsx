@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useTasks } from '../contexts/tasks/useTasks';
 import { getCriticism, getPraise } from '../features/praise';
 import { Dates } from '../services/dates';
-import { Message } from '../pages/home/Today';
+import { Message } from '../pages/home/Message';
 
 export function Praise() {
     const now = Dates.today().valueOf();

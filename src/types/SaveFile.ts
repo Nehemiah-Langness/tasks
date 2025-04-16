@@ -3,6 +3,10 @@ export interface SaveFile {
     tasks: Task[];
     pool: Pool[];
     poolConfiguration: PoolConfiguration;
+    streak: {
+        days: number;
+        start: number;
+    };
     subscription?: {
         endpoint: string;
         keys: {
@@ -14,7 +18,7 @@ export interface SaveFile {
 
 export interface PoolConfiguration {
     startDate: number;
-    cycleSize: number;
+    tasksPerDay: number;
     disabledTasks: number[];
 }
 

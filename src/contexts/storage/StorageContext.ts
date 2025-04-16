@@ -8,10 +8,12 @@ export const StorageContext = React.createContext<{
     data: SaveFile | undefined | null;
     load: (signal?: AbortSignal) => Promise<SaveFile | null>;
     save: (file: SaveFile, signal?: AbortSignal) => Promise<SaveFile | null>;
-    taskPool: Task[] | undefined | null;
+    taskPool: Task[];
+    allTasksInPool: { id: number; title: string }[];
 }>({
     data: null,
-    taskPool: null,
+    taskPool: [],
+    allTasksInPool: [],
     spaceLeft: MAX_DATA_LENGTH_PER_USER,
     spaceUsed: 0,
     save: async () => {

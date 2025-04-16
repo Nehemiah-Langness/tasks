@@ -6,6 +6,8 @@ import { StorageContext } from './StorageContext';
 import { MAX_DATA_LENGTH_PER_USER } from './maxSpace';
 import { Tasks } from '../../services/dates';
 
+type StorageApiResult = { data: SaveFile; pool: Task[]; poolTasks: { title: string; id: number }[] };
+
 export function StorageProvider({ children }: PropsWithChildren<object>) {
     const getToken = useToken();
     useEffect(() => {
@@ -22,7 +24,8 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
         };
     }, []);
 
-    const [taskPool, setTaskPool] = useState<Task[] | null>();
+    const [taskPool, setTaskPool] = useState<Task[]>([]);
+    const [allTasks, setAllTasks] = useState<{ id: number; title: string }[]>([]);
     const [data, setData] = useState<SaveFile | null>();
 
     const load = useCallback(
@@ -49,7 +52,7 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
                         throw new Error('Unable to save');
                     }
                 })
-                .then(async (result: { data: SaveFile; pool: Task[] }) => {
+                .then(async (result: StorageApiResult) => {
                     result.data.tasks.forEach((t) => {
                         Tasks.normalize(t);
                     });
@@ -66,23 +69,22 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
 
                     setData(result.data);
 
-                    const timezoneOffset = new Date().getTimezoneOffset()
-                    result.pool.forEach(x=>{
+                    const timezoneOffset = new Date().getTimezoneOffset();
+                    result.pool.forEach((x) => {
                         if (new Date(x.dueDate).getHours() !== 0) {
                             x.dueDate += timezoneOffset * 60000;
                             x.startDate += timezoneOffset * 60000;
                         }
-                        
-                    })
-                    console.log(result.pool)
-
+                    });
                     setTaskPool(result.pool);
+                    setAllTasks(result.poolTasks);
                     return result.data;
                 })
                 .catch((er) => {
                     console.error(er);
                     setData(null);
-                    setTaskPool(null);
+                    setAllTasks([]);
+                    setTaskPool([]);
                     return null;
                 });
         },
@@ -118,16 +120,24 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
                         throw new Error('Unable to save');
                     }
                 })
-                .then(async (result: { data: SaveFile; pool: Task[] }) => {
+                .then(async (result: StorageApiResult) => {
                     setData(result.data);
-                    console.log(result.pool)
+                    const timezoneOffset = new Date().getTimezoneOffset();
+                    result.pool.forEach((x) => {
+                        if (new Date(x.dueDate).getHours() !== 0) {
+                            x.dueDate += timezoneOffset * 60000;
+                            x.startDate += timezoneOffset * 60000;
+                        }
+                    });
+                    setAllTasks(result.poolTasks);
                     setTaskPool(result.pool);
                     return result.data;
                 })
                 .catch((er) => {
                     console.error(er);
                     setData(null);
-                    setTaskPool(null);
+                    setAllTasks([]);
+                    setTaskPool([]);
                     return null;
                 });
         },
@@ -148,6 +158,7 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
             value={{
                 data,
                 taskPool,
+                allTasksInPool: allTasks,
                 spaceUsed,
                 spaceLeft,
                 load,

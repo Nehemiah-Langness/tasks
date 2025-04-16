@@ -1,15 +1,16 @@
-import { PropsWithChildren, useCallback, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { formatDate } from '../../services/formatDate';
-import { Task } from '../../types/SaveFile';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarCheck, faCheckSquare, faStopwatch } from '@fortawesome/free-solid-svg-icons';
-import { NotificationsButton } from './NotificationsButton';
-import { useCompleteTask } from './useCompleteTask';
 import { useTasks } from '../../contexts/tasks/useTasks';
 import { Dates } from '../../services/dates';
-import { TaskDescription } from '../tasks/TaskDescription';
+import { TaskList } from './TaskList';
+import { AnimatedBackground } from './AnimatedBackground';
+import { TaskRow } from './TaskRow';
+import { useStorage } from '../../contexts/storage/useStorage';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFire } from '@fortawesome/free-solid-svg-icons';
 
 export function Today() {
+    const { data } = useStorage();
     const now = Dates.today().valueOf();
     const tomorrow = Dates.increment(now, 1, 'day').valueOf();
     const tasks = useTasks();
@@ -40,186 +41,78 @@ export function Today() {
     );
 
     return (
-        <div>
-            <div className='d-flex flex-column gap-3'>
-                <div className='d-flex gap-2 justify-content-center align-items-center'>
-                    <NotificationsButton />
-                    <span className='fs-140'>
-                        {formatDate(now, {
-                            day: true,
-                            date: true,
-                        })}
-                    </span>
+        <>
+            {data?.streak.days && (
+                <div className='streak'>
+                    <div className='position-absolute'>
+                        <FontAwesomeIcon icon={faFire} />
+                    </div>
+                    <span className='position-relative'>You are on a {data.streak.days} day streak!</span>
                 </div>
-                {dueToday.length || pastDue.length ? (
-                    <TaskList>
-                        {pastDue.map((t) => (
-                            <div key={t.id} className='list-group-item'>
-                                <TaskRow task={t} pastDue />
+            )}
+            <div>
+                <div className='d-flex flex-column gap-3'>
+                    <div className='d-flex gap-2 justify-content-center align-items-center'>
+                        <div className='d-flex flex-column align-items-center'>
+                            <div className='fs-200'>
+                                {formatDate(now, {
+                                    day: true,
+                                })}
                             </div>
-                        ))}
-                        {DueItems}
-                        {!!completedToday?.length && (
-                            <div className='list-group-item text-center py-3 bg-success-subtle position-relative overflow-hidden'>
-                                <AnimatedBackground />
-                                <div className='position-relative h5 mb-0 fw-normal' style={{ zIndex: 1 }}>
-                                    <b>{completedToday.length}</b> task
-                                    {completedToday.length === 1 ? '' : 's'} already completed
-                                </div>
-                            </div>
-                        )}
-                        {CompletedItems}
-                    </TaskList>
-                ) : (
-                    <TaskList>
-                        <div className='list-group-item d-flex justify-content-center align-items-center bg-success-subtle position-relative overflow-hidden'>
-                            <AnimatedBackground />
-                            <div className='fs-150 position-relative text-center' style={{ zIndex: 1 }}>
-                                All tasks are completed for the day!
-                                {!!completedToday?.length && (
-                                    <div className='fs-140'>You have finished {completedToday?.length} tasks today!</div>
-                                )}
+                            <div className='fs-140'>
+                                {formatDate(now, {
+                                    date: true,
+                                })}
                             </div>
                         </div>
-                        {CompletedItems}
-                    </TaskList>
-                )}
-
-                {!dueToday.length && !pastDue.length && dueTomorrow.length && (
-                    <TaskList title='Tomorrow&rsquo;s Tasks'>
-                        {dueTomorrow.map((t) => (
-                            <div key={t.id} className='list-group-item'>
-                                <TaskRow noComplete task={t} />
+                    </div>
+                    {dueToday.length || pastDue.length ? (
+                        <TaskList>
+                            {pastDue.map((t) => (
+                                <div key={t.id} className='list-group-item'>
+                                    <TaskRow task={t} pastDue />
+                                </div>
+                            ))}
+                            {DueItems}
+                            {!!completedToday?.length && (
+                                <div className='list-group-item text-center py-3 bg-success-subtle position-relative overflow-hidden'>
+                                    <AnimatedBackground />
+                                    <div className='position-relative h5 mb-0 fw-normal' style={{ zIndex: 1 }}>
+                                        <b>{completedToday.length}</b> task
+                                        {completedToday.length === 1 ? '' : 's'} already completed
+                                    </div>
+                                </div>
+                            )}
+                            {CompletedItems}
+                        </TaskList>
+                    ) : (
+                        <TaskList>
+                            <div className='list-group-item d-flex justify-content-center align-items-center bg-success-subtle position-relative overflow-hidden'>
+                                <AnimatedBackground />
+                                <div className='fs-150 position-relative text-center' style={{ zIndex: 1 }}>
+                                    All tasks are completed for the day!
+                                    {!!completedToday?.length && (
+                                        <div className='fs-140'>You have finished {completedToday?.length} tasks today!</div>
+                                    )}
+                                </div>
                             </div>
-                        ))}
-                    </TaskList>
-                )}
+                            {CompletedItems}
+                            <div className='list-group-item d-flex justify-content-center align-items-center bg-secondary-subtle position-relative overflow-hidden'>
+                                <div className='fs-150 position-relative text-center' style={{ zIndex: 1 }}>
+                                    {!!completedToday?.length && (
+                                        <div className='fs-140'>You have {dueTomorrow?.length} tasks coming up tomorrow</div>
+                                    )}
+                                </div>
+                            </div>
+                            {dueTomorrow.map((t) => (
+                                <div key={t.id} className='list-group-item'>
+                                    <TaskRow noComplete task={t} />
+                                </div>
+                            ))}
+                        </TaskList>
+                    )}
+                </div>
             </div>
-        </div>
-    );
-}
-
-function TaskList({ children, title }: PropsWithChildren<{ title?: string }>) {
-    return (
-        <>
-            {!!title && <span className='fs-140 text-center'>{title}</span>}
-            <div className='list-group list-group-flush w-100'>{children}</div>
         </>
-    );
-}
-
-function AnimatedBackground() {
-    return (
-        <div
-            className='animated-background'
-            style={{
-                background: 'url(/star-solid.svg) 0 0 /3rem, url(/star-solid.svg) 1.5rem 1.3rem /3rem',
-            }}
-        ></div>
-    );
-}
-
-export function Message({ message, onComplete, type }: { message: string; type: string; onComplete: () => void }) {
-    return (
-        <div
-            onAnimationEnd={(e) => {
-                if (e.animationName === 'message') {
-                    onComplete();
-                } else {
-                    alert(e.animationName);
-                }
-            }}
-            className={`message ${type}`}
-            onClick={onComplete}
-        >
-            <div>{message}</div>
-        </div>
-    );
-}
-
-export function TaskRow({
-    task,
-    pastDue,
-    completed,
-    noComplete,
-}: {
-    task: Task;
-    pastDue?: boolean;
-    completed?: boolean;
-    noComplete?: boolean;
-}) {
-    const completeTask = useCompleteTask(task.id);
-
-    return (
-        <div className='d-flex align-items-start justify-content-between flex-wrap flex-column flex-lg-row align-items-lg-center'>
-            <div className='d-flex gap-3 align-items-center'>
-                {!noComplete ? (
-                    <div>
-                        <CompleteButton onClick={completeTask} completed={completed} />
-                    </div>
-                ) : (
-                    <div className='btn'>
-                        <FontAwesomeIcon className='fs-200 text-secondary' icon={faStopwatch} />
-                    </div>
-                )}
-                <TaskDescription task={task} />
-            </div>
-            <div className='align-self-stretch text-center align-self-lg-start'>
-                {task.dueDate && pastDue && (
-                    <div style={{ paddingTop: 2, paddingBottom: 2 }} className='bg-danger-subtle px-3 fs-80 rounded-1 text-danger-emphasis'>
-                        Due:{' '}
-                        {Dates.format(task.dueDate, {
-                            date: true,
-                            summarize: true,
-                        })}
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-}
-
-function CompleteButton({ onClick, completed: alreadyComplete }: { onClick: () => void; completed?: boolean }) {
-    const [completed, setCompleted] = useState(false);
-
-    const ButtonIcon = useCallback(() => <FontAwesomeIcon className='fs-200' icon={faCheckSquare} />, []);
-
-    if (completed && !alreadyComplete) {
-        return (
-            <div
-                onAnimationEnd={(e) => {
-                    if (e.animationName === 'task-completed-from') {
-                        setTimeout(onClick, 500);
-                    }
-                }}
-                className='task-completed '
-            >
-                <div className='original'>
-                    <button
-                        className={`btn btn-link text-decoration-none ${
-                            alreadyComplete ? 'link-success' : 'link-primary'
-                        } d-flex align-items-center`}
-                    >
-                        <ButtonIcon />
-                    </button>
-                </div>
-                <div className='from text-primary'>
-                    <ButtonIcon />
-                </div>
-                <div className='to text-success'>
-                    <FontAwesomeIcon className='fs-200' icon={faCalendarCheck} />
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <button
-            disabled={alreadyComplete}
-            className={`btn btn-link text-decoration-none ${alreadyComplete ? 'link-success' : 'link-primary'} d-flex align-items-center`}
-            onClick={() => setCompleted(true)}
-        >
-            <ButtonIcon />
-        </button>
     );
 }
