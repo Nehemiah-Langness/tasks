@@ -25,9 +25,9 @@ export function Home() {
     }
 
     return (
-        <div className='container d-flex flex-column gap-2'>
+        <div className='container d-flex flex-column gap-4'>
             <Today />
-            <Link to={'/tasks'} className={`btn btn-primary align-self-center`}>
+            <Link to={'/tasks'} className={`btn btn-outline-primary align-self-lg-center rounded-0 fw-bold px-5 py-3`}>
                 Manage Your Tasks
             </Link>
         </div>

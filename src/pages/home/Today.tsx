@@ -7,6 +7,7 @@ import { NotificationsButton } from './NotificationsButton';
 import { useCompleteTask } from './useCompleteTask';
 import { useTasks } from '../../contexts/tasks/useTasks';
 import { Dates } from '../../services/dates';
+import { TaskDescription } from '../tasks/TaskDescription';
 
 export function Today() {
     const now = Dates.today().valueOf();
@@ -59,9 +60,9 @@ export function Today() {
                         ))}
                         {DueItems}
                         {!!completedToday?.length && (
-                            <div className='list-group-item text-center h5 mb-0 fw-normal bg-success-subtle position-relative overflow-hidden'>
+                            <div className='list-group-item text-center py-3 bg-success-subtle position-relative overflow-hidden'>
                                 <AnimatedBackground />
-                                <div className='position-relative' style={{ zIndex: 1 }}>
+                                <div className='position-relative h5 mb-0 fw-normal' style={{ zIndex: 1 }}>
                                     <b>{completedToday.length}</b> task
                                     {completedToday.length === 1 ? '' : 's'} already completed
                                 </div>
@@ -102,7 +103,7 @@ function TaskList({ children, title }: PropsWithChildren<{ title?: string }>) {
     return (
         <>
             {!!title && <span className='fs-140 text-center'>{title}</span>}
-            <div className='list-group w-100'>{children}</div>
+            <div className='list-group list-group-flush w-100'>{children}</div>
         </>
     );
 }
@@ -150,7 +151,7 @@ export function TaskRow({
     const completeTask = useCompleteTask(task.id);
 
     return (
-        <div className='d-flex gap-3 align-items-center justify-content-between flex-wrap'>
+        <div className='d-flex align-items-start justify-content-between flex-wrap flex-column flex-lg-row align-items-lg-center'>
             <div className='d-flex gap-3 align-items-center'>
                 {!noComplete ? (
                     <div>
@@ -161,21 +162,11 @@ export function TaskRow({
                         <FontAwesomeIcon className='fs-200 text-secondary' icon={faStopwatch} />
                     </div>
                 )}
-                <div className='h5 mb-0 fw-normal'>{task.description}</div>
+                <TaskDescription task={task} />
             </div>
-
-            <div className='d-flex gap-2 align-items-center px-3 flex-wrap'>
-                {task.lastCompleted && (
-                    <div style={{ paddingTop: 2, paddingBottom: 2 }} className='fs-80 rounded-pill text-success'>
-                        Completed:{' '}
-                        {Dates.format(task.lastCompleted, {
-                            date: true,
-                            summarize: true,
-                        })}
-                    </div>
-                )}
+            <div className='align-self-stretch text-center align-self-lg-start'>
                 {task.dueDate && pastDue && (
-                    <div style={{ paddingTop: 2, paddingBottom: 2 }} className='bg-danger px-3 fs-80 rounded-pill text-white'>
+                    <div style={{ paddingTop: 2, paddingBottom: 2 }} className='bg-danger-subtle px-3 fs-80 rounded-1 text-danger-emphasis'>
                         Due:{' '}
                         {Dates.format(task.dueDate, {
                             date: true,
