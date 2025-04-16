@@ -65,6 +65,17 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
                     });
 
                     setData(result.data);
+
+                    const timezoneOffset = new Date().getTimezoneOffset()
+                    result.pool.forEach(x=>{
+                        if (new Date(x.dueDate).getHours() !== 0) {
+                            x.dueDate += timezoneOffset * 60000;
+                            x.startDate += timezoneOffset * 60000;
+                        }
+                        
+                    })
+                    console.log(result.pool)
+
                     setTaskPool(result.pool);
                     return result.data;
                 })
@@ -109,6 +120,7 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
                 })
                 .then(async (result: { data: SaveFile; pool: Task[] }) => {
                     setData(result.data);
+                    console.log(result.pool)
                     setTaskPool(result.pool);
                     return result.data;
                 })
