@@ -21,6 +21,7 @@ self.addEventListener('push', function (event) {
             tag: tag,
             renotify: true,
             silent: false,
+            
         })
     );
 });
