@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useStorage } from '../../contexts/storage/useStorage';
+import { useStorage } from '../storage/useStorage';
 import { getTaskPool } from '../../features/quick-task-pool/get-task-pool';
 import { Dates, Tasks } from '../../services/dates';
 

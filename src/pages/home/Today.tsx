@@ -1,12 +1,11 @@
-import { PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react';
+import { PropsWithChildren, useCallback, useMemo, useState } from 'react';
 import { formatDate } from '../../services/formatDate';
 import { Task } from '../../types/SaveFile';
-import { getCriticism, getPraise } from '../../features/praise';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarCheck, faCheckSquare, faStopwatch } from '@fortawesome/free-solid-svg-icons';
 import { NotificationsButton } from './NotificationsButton';
 import { useCompleteTask } from './useCompleteTask';
-import { useTasks } from './useTasks';
+import { useTasks } from '../../contexts/tasks/useTasks';
 import { Dates } from '../../services/dates';
 
 export function Today() {
@@ -18,35 +17,6 @@ export function Today() {
     const dueToday = useMemo(() => tasks?.filter((x) => x.dueDate && x.dueDate === now) ?? [], [now, tasks]);
     const dueTomorrow = useMemo(() => tasks?.filter((x) => x.dueDate && x.dueDate === tomorrow) ?? [], [tomorrow, tasks]);
     const completedToday = useMemo(() => tasks?.filter((x) => x.lastCompleted && x.lastCompleted >= now), [now, tasks]);
-
-    const hasPastDueItems = pastDue.length > 0;
-    const hasGoodDay = dueToday.length === 0 && !hasPastDueItems;
-
-    const [message, setMessage] = useState<{
-        type: 'praise' | 'criticism';
-        message: string;
-    }>();
-    useEffect(() => {
-        if (hasPastDueItems) {
-            setMessage({
-                message: getCriticism(),
-                type: 'criticism',
-            });
-        }
-    }, [hasPastDueItems]);
-
-    useEffect(() => {
-        if (hasGoodDay) {
-            setMessage({
-                message: getPraise(),
-                type: 'praise',
-            });
-        }
-    }, [hasGoodDay]);
-
-    const clearMessage = useCallback(() => {
-        setMessage(undefined);
-    }, []);
 
     const DueItems = useMemo(
         () =>
@@ -70,8 +40,6 @@ export function Today() {
 
     return (
         <div>
-            {message && <Message message={message.message} onComplete={clearMessage} type={message.type} />}
-
             <div className='d-flex flex-column gap-3'>
                 <div className='d-flex gap-2 justify-content-center align-items-center'>
                     <NotificationsButton />
@@ -82,9 +50,13 @@ export function Today() {
                         })}
                     </span>
                 </div>
-                {dueToday.length ? (
+                {dueToday.length || pastDue.length ? (
                     <TaskList>
-                        <span className='fs-140 fw-light'>Today's Tasks</span>
+                        {pastDue.map((t) => (
+                            <div key={t.id} className='list-group-item'>
+                                <TaskRow task={t} pastDue />
+                            </div>
+                        ))}
                         {DueItems}
                         {!!completedToday?.length && (
                             <div className='list-group-item text-center h5 mb-0 fw-normal bg-success-subtle position-relative overflow-hidden'>
@@ -109,16 +81,6 @@ export function Today() {
                             </div>
                         </div>
                         {CompletedItems}
-                    </TaskList>
-                )}
-                {!!pastDue.length && (
-                    <TaskList>
-                        <span className='fs-140 fw-light'>Tasks You've Missed</span>
-                        {pastDue.map((t) => (
-                            <div key={t.id} className='list-group-item'>
-                                <TaskRow task={t} pastDue />
-                            </div>
-                        ))}
                     </TaskList>
                 )}
 
@@ -156,7 +118,7 @@ function AnimatedBackground() {
     );
 }
 
-function Message({ message, onComplete, type }: { message: string; type: string; onComplete: () => void }) {
+export function Message({ message, onComplete, type }: { message: string; type: string; onComplete: () => void }) {
     return (
         <div
             onAnimationEnd={(e) => {

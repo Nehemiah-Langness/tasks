@@ -3,7 +3,7 @@ import { useOffCanvas } from '../offcanvas/useOffCanvas';
 import { useStorage } from '../storage/useStorage';
 import { RecurrenceType, Task } from '../../types/SaveFile';
 import { TaskEditContext } from './TaskEditContext';
-import { TaskEditForm } from '../../pages/home/TaskEditForm';
+import { TaskEditForm } from '../../pages/tasks/TaskEditForm';
 import { Dates } from '../../services/dates';
 
 export function TaskEditProvider({ children }: PropsWithChildren) {
@@ -11,8 +11,9 @@ export function TaskEditProvider({ children }: PropsWithChildren) {
     const { open, close, setContent, setTitle, isOpen } = useOffCanvas();
     const { data, save: saveData } = useStorage();
 
+    const isNew = !!data?.tasks.find((t) => t.id === task?.id);
+
     const create = useCallback(() => {
-        setTitle('Create Task');
         setTask({
             description: '',
             id: crypto.randomUUID(),
@@ -22,11 +23,15 @@ export function TaskEditProvider({ children }: PropsWithChildren) {
                 type: RecurrenceType.Daily,
             },
         });
-    }, [setTitle]);
+    }, []);
+
+    const load = useCallback((task: Task) => {
+        setTask(task);
+    }, []);
 
     const cancel = useCallback(() => {
-        setTask(undefined);
-    }, []);
+        close();
+    }, [close]);
 
     const save = useCallback(
         async (newTask: Task) => {
@@ -46,15 +51,6 @@ export function TaskEditProvider({ children }: PropsWithChildren) {
         [data, saveData]
     );
 
-    const load = useCallback(
-        (task: Task) => {
-            console.log('Setting Task');
-            setTitle('Edit Task');
-            setTask(task);
-        },
-        [setTitle]
-    );
-
     useEffect(() => {
         if (!isOpen) {
             setTask(undefined);
@@ -63,20 +59,15 @@ export function TaskEditProvider({ children }: PropsWithChildren) {
 
     useEffect(() => {
         if (task) {
-            setContent(<TaskEditForm save={save} task={task} />);
-        }
-    }, [save, setContent, task]);
-
-    useEffect(() => {
-        if (task) {
             open();
+            const revertTitle = setTitle(isNew ? 'Create Task' : 'Edit Task');
+            const revertContent = setContent(<TaskEditForm save={save} task={task} />);
             return () => {
-                setTitle(null);
-                setContent(null);
-                close();
+                revertTitle();
+                revertContent();
             };
         }
-    }, [close, open, setContent, setTitle, task]);
+    }, [isNew, open, save, setContent, setTitle, task]);
 
     return <TaskEditContext.Provider value={{ create, cancel, load }}>{children}</TaskEditContext.Provider>;
 }

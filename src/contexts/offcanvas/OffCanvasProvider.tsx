@@ -29,6 +29,24 @@ export function OffCanvasProvider({ children }: PropsWithChildren<object>) {
         }
     }, [getOffCanvas]);
 
+    const setTitleWithRevert = useCallback((content: React.ReactNode) => {
+        let prev: React.ReactNode = null;
+        setTitle((current) => {
+            prev = current;
+            return content;
+        });
+        return () => setTitle(prev);
+    }, []);
+
+    const setContentWithRevert = useCallback((content: React.ReactNode) => {
+        let prev: React.ReactNode = null;
+        setContent((current) => {
+            prev = current;
+            return content;
+        });
+        return () => setContent(prev);
+    }, []);
+
     const [isOpen, setIsOpen] = useState(false);
     const element = ref.current;
     useEffect(() => {
@@ -55,9 +73,9 @@ export function OffCanvasProvider({ children }: PropsWithChildren<object>) {
                 open: show,
                 close: hide,
                 Content,
-                setContent,
+                setContent: setContentWithRevert,
                 Title,
-                setTitle,
+                setTitle: setTitleWithRevert,
                 isOpen,
             }}
         >
