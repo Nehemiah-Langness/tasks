@@ -82,7 +82,10 @@ export class Tasks {
 
 export class Dates {
     static today() {
-        return Dates.date(Date.now());
+        const date = Dates.date(Date.now());
+        const local = new Date();
+        local.setTime(local.getTime() - local.getTimezoneOffset() * 60 * 1000);
+        return Dates.increment(date, local.getUTCDate() - date.getUTCDate(), 'day');
     }
 
     private static millisecondsPerDay = 24 * 60 * 60 * 1000;
