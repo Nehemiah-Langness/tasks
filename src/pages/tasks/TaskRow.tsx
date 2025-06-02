@@ -1,4 +1,4 @@
-import { faInfoCircle, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Task } from '../../types/SaveFile';
 import { useEditTasks } from '../../contexts/edit-tasks/useEditTasks';
@@ -8,7 +8,7 @@ import { Dates } from '../../services/dates';
 import { TaskDescription } from './TaskDescription';
 
 export function TaskRow({ task }: { task: Task }) {
-    const { load } = useEditTasks();
+    const { load, create } = useEditTasks();
     const deleteTask = useDeleteTask(task.id);
 
     return (
@@ -27,6 +27,7 @@ export function TaskRow({ task }: { task: Task }) {
                             Due: {Dates.format(task.dueDate, { date: true, summarize: true, day: true })}
                         </div>
                     )}
+                    {typeof task.poolId === 'number' && <div className='fs-80 text-info text-nowrap'>5-Minute Task Pool</div>}
                 </div>
             </div>
             {!task.id.startsWith('pool-') ? (
@@ -39,7 +40,7 @@ export function TaskRow({ task }: { task: Task }) {
                         <FontAwesomeIcon className='fs-larger' icon={faPenToSquare} /> Edit
                     </button>
                     <button
-                        className='btn btn-link link-danger text-decoration-none fs-80 d-flex-center  gap-1'
+                        className='btn btn-link link-danger text-decoration-none fs-80 d-flex-center gap-1'
                         type='button'
                         onClick={deleteTask}
                     >
@@ -47,8 +48,19 @@ export function TaskRow({ task }: { task: Task }) {
                     </button>
                 </div>
             ) : (
-                <div className='fs-80 px-3 text-info' title='This tasks comes from a pool of pre-built task to work through'>
-                    <FontAwesomeIcon icon={faInfoCircle} /> 5-Minute Task
+                <div className='d-flex align-items-center gap-2'>
+                    <button
+                        className='btn btn-link text-decoration-none fs-80 d-flex-center gap-1'
+                        type='button'
+                        onClick={() =>
+                            create({
+                                description: task.description,
+                                poolId: +task.id.replace('pool-', ''),
+                            })
+                        }
+                    >
+                        <FontAwesomeIcon className='fs-larger' icon={faPlus} /> <div>Convert to Regular Task</div>
+                    </button>
                 </div>
             )}
         </div>

@@ -17,6 +17,7 @@ export function OffCanvasProvider({ children }: PropsWithChildren<object>) {
 
     const show = useCallback(() => {
         const offCanvas = getOffCanvas();
+        console.log(offCanvas);
         if (offCanvas) {
             offCanvas.show();
         }

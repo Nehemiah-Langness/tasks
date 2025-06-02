@@ -8,7 +8,7 @@ import { PoolEditForm } from './PoolEditForm';
 
 export function EditPoolButton() {
     const { data, save, allTasksInPool } = useStorage();
-    const { setContent, setTitle, close, open } = useOffCanvas();
+    const { setContent, setTitle, close, open, isOpen } = useOffCanvas();
     const [poolConfig, setPoolConfig] = useState<PoolConfiguration>();
 
     const savePool = useCallback(
@@ -23,6 +23,12 @@ export function EditPoolButton() {
         },
         [data, save]
     );
+
+    useEffect(() => {
+        if (!isOpen) {
+            setPoolConfig(undefined);
+        }
+    }, [isOpen]);
 
     useEffect(() => {
         if (poolConfig) {

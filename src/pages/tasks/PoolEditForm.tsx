@@ -6,7 +6,7 @@ import { DateInput } from '../../components/DateInput';
 export function PoolEditForm({
     save,
     poolConfiguration,
-    pool,
+    pool: fullPool,
 }: {
     poolConfiguration: PoolConfiguration;
     save: (t: PoolConfiguration) => void;
@@ -22,13 +22,15 @@ export function PoolEditForm({
         setForm(poolConfiguration);
     }, [poolConfiguration]);
 
-    const days = Math.ceil(pool.length / (form.tasksPerDay < 1 ? 1 : form.tasksPerDay));
-    const leftOverDays = days * form.tasksPerDay - pool.length;
+    const activePool = fullPool.filter((x) => !form.disabledTasks.includes(x.id));
+
+    const days = Math.ceil(activePool.length / (form.tasksPerDay < 1 ? 1 : form.tasksPerDay));
+    const leftOverDays = days * form.tasksPerDay - activePool.length;
 
     return (
         <div className='d-flex flex-column h-100 gap-2'>
-            <div className='flex-grow-1'>
-                <div className='form'>
+            <div className='flex-grow-1 overflow-hidden'>
+                <div className='form d-flex flex-column h-100'>
                     <div className='form-group'>
                         <label>Beginning On</label>
                         <DateInput value={form.startDate} setValue={(v) => changeForm('startDate', v)} />
@@ -53,12 +55,40 @@ export function PoolEditForm({
                             <span className='input-group-text'>Tasks/Days</span>
                         </div>
                     </div>
+                    <div className='form-group flex-grow-1 overflow-auto'>
+                        <label>Task Pool</label>
+                        <div className='ps-1'>
+                            {fullPool.map((p) => (
+                                <div className='form-check form-switch'>
+                                    <input
+                                        checked={!form.disabledTasks.includes(p.id)}
+                                        onChange={(e) =>
+                                            changeForm(
+                                                'disabledTasks',
+                                                (form.disabledTasks.filter((x) => x !== p.id) as (number | null)[])
+                                                    .concat(!e.target.checked ? p.id : null)
+                                                    .filter((x) => x !== null) as number[]
+                                            )
+                                        }
+                                        className='form-check-input'
+                                        type='checkbox'
+                                        role='switch'
+                                        id={`checkbox-${p.id}`}
+                                    />
+                                    <label className='form-check-label' htmlFor={`checkbox-${p.id}`}>
+                                        {p.title}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
+
             <div className='form-group'>
                 <label className='fs-140'>5-Minute Task Pool</label>
                 <div className='d-flex flex-column gap-1 py-1'>
-                    You will finish the pool of {pool.length} tasks in {days} day{days === 1 ? '' : 's'} starting on{' '}
+                    You will finish the pool of {activePool.length} tasks in {days} day{days === 1 ? '' : 's'} starting on{' '}
                     {formatDate(new Date(form.startDate), {
                         date: true,
                     })}
@@ -72,6 +102,7 @@ export function PoolEditForm({
                     .
                 </div>
             </div>
+
             <button className='btn btn-success' onClick={() => save(form)}>
                 Save
             </button>

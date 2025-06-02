@@ -11,9 +11,9 @@ export function TaskEditProvider({ children }: PropsWithChildren) {
     const { open, close, setContent, setTitle, isOpen } = useOffCanvas();
     const { data, save: saveData } = useStorage();
 
-    const isNew = !!data?.tasks.find((t) => t.id === task?.id);
+    const isNew = !data?.tasks.find((t) => t.id === task?.id);
 
-    const create = useCallback(() => {
+    const create = useCallback((task?: Partial<Task>) => {
         setTask({
             description: '',
             id: crypto.randomUUID(),
@@ -22,6 +22,7 @@ export function TaskEditProvider({ children }: PropsWithChildren) {
             filters: {
                 type: RecurrenceType.Daily,
             },
+            ...task,
         });
     }, []);
 

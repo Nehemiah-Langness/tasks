@@ -3,7 +3,7 @@ import { Task } from "../../types/SaveFile";
 
 export const TaskEditContext = React.createContext<{
   cancel: () => void;
-  create: () => void;
+  create: (task?: Partial<Task>) => void;
   load: (task: Task) => void;
 }>({
   cancel: () => {

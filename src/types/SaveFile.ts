@@ -20,6 +20,7 @@ export interface PoolConfiguration {
     startDate: number;
     tasksPerDay: number;
     disabledTasks: number[];
+    taskDays: number[];
 }
 
 export interface Pool {
@@ -29,6 +30,7 @@ export interface Pool {
 
 export interface Task {
     id: string;
+    poolId?: number;
     description: string;
     lastCompleted?: number;
     startDate: number;
@@ -46,9 +48,12 @@ export interface Task {
 }
 
 export enum RecurrenceType {
-    WeekDay,
-    MonthDay,
-    Daily,
-    IntervalDay,
-    Custom,
+    WeekDay = 0,
+    MonthDay = 1,
+    Daily = 2,
+    IntervalDay = 3,
+    Custom = 4,
+    IntervalWeek = 5,
+    IntervalMonth = 6,
+    IntervalYear = 7,
 }
