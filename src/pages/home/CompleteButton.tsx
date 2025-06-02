@@ -17,7 +17,7 @@ export function CompleteButton({ onClick, completed: alreadyComplete }: { onClic
             <div
                 onAnimationEnd={(e) => {
                     if (e.animationName === 'task-completed-from') {
-                        setTimeout(onClick, 500);
+                        onClick();
                     }
                 }}
                 className='task-completed '

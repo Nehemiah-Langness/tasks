@@ -40,8 +40,14 @@ export function PoolEditForm({
                             <span className='input-group-text'>Complete</span>
                             <input
                                 type='number'
-                                value={form.tasksPerDay}
-                                onChange={(e) => (e.target.valueAsNumber ? changeForm('tasksPerDay', e.target.valueAsNumber) : null)}
+                                value={form.tasksPerDay === 0 ? '' : form.tasksPerDay}
+                                onChange={(e) =>
+                                    !e.target.value
+                                        ? changeForm('tasksPerDay', 0)
+                                        : e.target.valueAsNumber
+                                        ? changeForm('tasksPerDay', e.target.valueAsNumber)
+                                        : null
+                                }
                                 className='form-control'
                             />
                             <span className='input-group-text'>Tasks/Days</span>
