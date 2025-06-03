@@ -47,7 +47,7 @@ export function Today() {
                     <div className='position-absolute'>
                         <FontAwesomeIcon icon={faFire} />
                     </div>
-                    <span className='position-relative'>You are on a {data.streak.days} day streak!</span>
+                    <span className='position-relative '>You are on a {data.streak.days} day streak!</span>
                 </div>
             )}
             <div>

@@ -33,12 +33,12 @@ export function EditPoolButton() {
     useEffect(() => {
         if (poolConfig) {
             const revertTitle = setTitle('Edit 5-Minute Task Pool');
-            setContent(<PoolEditForm poolConfiguration={poolConfig} save={savePool} pool={allTasksInPool} />);
+            setContent(<PoolEditForm poolConfiguration={poolConfig} save={savePool} pool={allTasksInPool} tasks={data?.tasks ?? []} />);
             return () => {
                 revertTitle();
             };
         }
-    }, [allTasksInPool, poolConfig, savePool, setContent, setTitle]);
+    }, [allTasksInPool, data?.tasks, poolConfig, savePool, setContent, setTitle]);
 
     useEffect(() => {
         if (poolConfig) {

@@ -12,6 +12,7 @@ $form-check-input-checked-bg-color: var(--bs-dark);
 $form-check-input-checked-color: #ebf2f9;
 
 @import '../node_modules/bootstrap/scss/bootstrap.scss';
+@import './styles/typography';
 
 .form-control {
     border-top-style: none;
@@ -28,26 +29,11 @@ body,
     height: 100%;
 }
 
+
+
 .logo {
     background: var(--bs-light);
     border-radius: 25%;
-}
-
-.fs-larger {
-    font-size: 1.1em !important;
-}
-
-.fs-140 {
-    font-size: 1.4rem !important;
-}
-.fs-150 {
-    font-size: 1.5rem !important;
-}
-.fs-200 {
-    font-size: 2rem !important;
-}
-.fs-80 {
-    font-size: 0.8rem !important;
 }
 
 .d-flex-center {
@@ -83,22 +69,26 @@ body,
     & > div {
         border-radius: 0.5rem;
         padding: 4rem;
+        height: 100%;
+        width: 100%;
     }
 
     &.criticism {
-        color: var(--bs-white);
-        background: rgba(var(--bs-primary-rgb), 0.4);
+        color: var(--bs-danger);
+        background: rgba(var(--bs-danger-rgb), 0.4);
 
         & > div {
-            background: rgba(var(--bs-dark-rgb), 1);
+            background: #e7e0c5;
+            background: center/cover no-repeat url('/paper.jpg');
         }
     }
 
     &.praise {
-        color: var(--bs-primary);
+        color: var(--bs-dark);
         background: rgba(var(--bs-primary-rgb), 0.4);
         & > div {
-            background: rgba(var(--bs-white-rgb), 1);
+            background: #e7e0c5;
+            background: center/cover no-repeat url('/paper.jpg');
         }
     }
 }
@@ -221,7 +211,7 @@ body,
         color: #ff5a0099;
         transform: translate(0, -30%) rotate(23deg);
         font-size: 8rem;
-    } 
+    }
     50% {
         color: #ff9a0099;
         transform: translate(-1rem, -30%) rotate(26deg);
@@ -229,13 +219,26 @@ body,
     }
     100% {
         color: #a5260099;
-        transform: translate(-.5rem, -30%) rotate(32deg);
+        transform: translate(-0.5rem, -30%) rotate(32deg);
         font-size: 7rem;
     }
 }
 
 @keyframes streak {
+    0% {
+        border-color: #ff5a0055;
+    }
+    25% {
+        border-color: #ff5a0099;
+    }
+    50% {
+        border-color: #ff9a0099;
+    }
+    75% {
+        border-color: #a5260099;
+    }
     100% {
+        border-color: #ff5a0055;
         background-position: -8.5rem -1rem;
     }
 }

@@ -9,7 +9,7 @@ export function Message({ message, onComplete, type }: { message: string; type: 
                     alert(e.animationName);
                 }
             }}
-            className={`message ${type}`}
+            className={`message ${type} ff-cursive`}
             onClick={onComplete}
         >
             <div>{message}</div>

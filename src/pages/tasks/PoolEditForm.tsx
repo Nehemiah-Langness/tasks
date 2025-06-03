@@ -1,16 +1,18 @@
 import { useState, useCallback, useEffect } from 'react';
 import { formatDate } from '../../services/formatDate';
-import { PoolConfiguration } from '../../types/SaveFile';
+import { PoolConfiguration, Task } from '../../types/SaveFile';
 import { DateInput } from '../../components/DateInput';
 
 export function PoolEditForm({
     save,
     poolConfiguration,
     pool: fullPool,
+    tasks
 }: {
     poolConfiguration: PoolConfiguration;
     save: (t: PoolConfiguration) => void;
     pool: { id: number; title: string }[];
+    tasks: Task[]
 }) {
     const [form, setForm] = useState(poolConfiguration);
 
@@ -61,6 +63,7 @@ export function PoolEditForm({
                             {fullPool.map((p) => (
                                 <div className='form-check form-switch'>
                                     <input
+                                        disabled={tasks.some(t=> t.poolId === p.id && !t.id.startsWith('pool-'))}
                                         checked={!form.disabledTasks.includes(p.id)}
                                         onChange={(e) =>
                                             changeForm(
