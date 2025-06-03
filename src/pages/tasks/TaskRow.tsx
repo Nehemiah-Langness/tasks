@@ -13,7 +13,7 @@ export function TaskRow({ task }: { task: Task }) {
 
     return (
         <div className='px-2 py-2 border rounded d-flex flex-column gap-2'>
-            <div className='d-flex align-items-start justify-content-between flex-wrap flex-column flex-lg-row align-items-lg-center'>
+            <div className='d-flex align-items-start justify-content-between flex-wrap flex-column flex-lg-row'>
                 <TaskDescription task={task} interval />
 
                 <div className='text-lg-end'>

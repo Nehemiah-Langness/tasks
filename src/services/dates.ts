@@ -10,7 +10,6 @@ export class Tasks {
         task.lastCompleted = today;
         task.dueDate = (Tasks.nextDueDate(task.startDate, task.filters, tomorrow) ?? tomorrow).valueOf();
         task.startDate = task.dueDate;
-        console.log(task);
     }
 
     static normalize(task: Task) {

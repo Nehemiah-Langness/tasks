@@ -29,7 +29,7 @@ export function TaskRow({
                         <FontAwesomeIcon className='fs-200 text-secondary' icon={faStopwatch} />
                     </div>
                 )}
-                <TaskDescription task={task} />
+                <TaskDescription task={task} centerTitle />
             </div>
             <div className='align-self-stretch text-center align-self-lg-start'>
                 {task.dueDate && pastDue && (

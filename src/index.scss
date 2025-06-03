@@ -29,8 +29,6 @@ body,
     height: 100%;
 }
 
-
-
 .logo {
     background: var(--bs-light);
     border-radius: 25%;
@@ -165,7 +163,7 @@ body,
 
 @keyframes animated-background {
     from {
-        top: -5.3rem;
+        top: -3rem;
     }
     to {
         top: 0rem;
@@ -174,18 +172,20 @@ body,
 
 .streak {
     position: relative;
-    padding: 1rem;
-    background: #ffce00;
-    border: 1rem solid #ff5a0055;
-    border-radius: 0.25rem;
-
-    background-image: repeating-linear-gradient(-45deg, transparent, transparent 3rem, #ff9a0055 3rem, #ff9a0055 6rem);
-    background-size: 200% 200%;
-    animation: streak 3s linear infinite;
-    background-position: -17rem -1rem;
+    padding: 0.5rem;
+    background: #ff5a00;
+    background: linear-gradient(
+        45deg,
+        rgba(255, 90, 0, 1) 0%,
+        rgba(255, 154, 0, 1) 60%,
+        rgba(255, 171, 0, 1) 85%,
+        rgba(255, 206, 0, 1) 100%
+    );
+    background-size: 400% 400%;
+    animation: streak 6s linear infinite;
 
     color: white;
-    font-size: 2rem;
+    font-size: 1.5rem;
     text-align: center;
     font-style: italic;
     font-weight: bold;
@@ -194,7 +194,7 @@ body,
     > .position-absolute {
         svg {
             top: 50%;
-            font-size: 8rem;
+            font-size: 6rem;
             transform: translate(0, -30%) rotate(23deg);
             color: #ff5a0099;
             animation: flame 2s ease-in-out infinite alternate-reverse;
@@ -226,19 +226,15 @@ body,
 
 @keyframes streak {
     0% {
-        border-color: #ff5a0055;
-    }
-    25% {
-        border-color: #ff5a0099;
+        background-position: 0% 50%;
+        color: white;
     }
     50% {
-        border-color: #ff9a0099;
-    }
-    75% {
-        border-color: #a5260099;
+        background-position: 100% 50%;
+        color: rgb(153, 229, 252);
     }
     100% {
-        border-color: #ff5a0055;
-        background-position: -8.5rem -1rem;
+        background-position: 0% 50%;
+        color: white;
     }
 }

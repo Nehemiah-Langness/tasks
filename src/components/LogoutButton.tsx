@@ -1,16 +1,24 @@
-import { useAuth0 } from "@auth0/auth0-react";
+import { useAuth0 } from '@auth0/auth0-react';
+import { UserImage } from './UserImage';
 
 export function LogoutButton() {
-  const { logout } = useAuth0();
+    const { logout } = useAuth0();
 
-  return (
-    <button
-      className="btn btn-primary btn fs-80 rounded-pill"
-      onClick={() =>
-        logout({ logoutParams: { returnTo: window.location.origin } })
-      }
-    >
-      Log out
-    </button>
-  );
+    return (
+        <div className='dropdown-center align-self-stretch d-flex position-relative' data-bs-theme="light">
+            <button className='btn btn-outline-primary btn p-0 fs-80 rounded-pill' type='button' data-bs-toggle='dropdown' aria-expanded='false'>
+                <UserImage size={'2.75rem'} />
+            </button>
+            <ul className='dropdown-menu dropdown-menu-end'>
+                <li>
+                    <button
+                        className='dropdown-item'
+                        onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
+                    >
+                        Log out
+                    </button>
+                </li>
+            </ul>
+        </div>
+    );
 }

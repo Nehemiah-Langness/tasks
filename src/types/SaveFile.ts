@@ -7,6 +7,7 @@ export interface SaveFile {
         days: number;
         start: number;
     };
+    vacation?: Vacation;
     subscription?: {
         endpoint: string;
         keys: {
@@ -14,6 +15,11 @@ export interface SaveFile {
             p256dh: string;
         };
     };
+}
+
+export interface Vacation {
+    start: number;
+    end: number;
 }
 
 export interface PoolConfiguration {

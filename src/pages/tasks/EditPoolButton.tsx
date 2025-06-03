@@ -51,10 +51,10 @@ export function EditPoolButton() {
 
     return (
         <button
-            className='btn btn-link link-success text-decoration-none d-flex align-items-center gap-2'
+            className='btn btn-link link-success text-decoration-none d-flex align-items-center gap-2 text-nowrap'
             onClick={() => setPoolConfig(data?.poolConfiguration)}
         >
-            <FontAwesomeIcon style={{ fontSize: '1.1em' }} icon={faPencilSquare} /> Edit 5-Minute Tasks
+            <FontAwesomeIcon style={{ fontSize: '1.1em' }} icon={faPencilSquare} /> 5-Minute Tasks
         </button>
     );
 }

@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { TaskEditProvider } from '../contexts/edit-tasks/TaskEditProvider';
-import { faArrowLeft, faSave } from '@fortawesome/free-solid-svg-icons';
+import { faSave } from '@fortawesome/free-solid-svg-icons';
 import { formatDate } from '../services/formatDate';
 import { useStorage } from '../contexts/storage/useStorage';
 import { useTasks } from '../contexts/tasks/useTasks';
@@ -10,6 +10,7 @@ import { NewTaskButton } from './tasks/NewTaskButton';
 import { EditPoolButton } from './tasks/EditPoolButton';
 import { TaskRow } from './tasks/TaskRow';
 import { Link } from 'react-router';
+import { VacationButton } from './tasks/VacationButton';
 
 export function Tasks() {
     const { data, spaceLeft, spaceUsed } = useStorage();
@@ -26,16 +27,21 @@ export function Tasks() {
 
     return (
         <TaskEditProvider>
-            <div className='container d-flex flex-column gap-2'>
-                <Link to={'/'} className='text-center text-decoration-none fs-150'>
-                    <FontAwesomeIcon icon={faArrowLeft} /> Back to Today's Agenda
+            <div className='container d-flex flex-column gap-2 mt-5'>
+                <Link to={'/'} className={`btn btn-outline-primary align-self-lg-center rounded-0 fw-bold px-5 py-3`}>
+                    View Today's Agenda
                 </Link>
-                <div className='d-flex gap-2 justify-content-between align-items-center'>
+                <div className='d-flex gap-2 align-items-center flex-wrap'>
                     <NewTaskButton />
                     <EditPoolButton />
+                    <VacationButton />
                 </div>
-                <div className='d-flex justify-content-between align-items-center gap-2'>
-                    <span className='fs-140 fw-light'>Your Tasks List</span>
+                <div className='d-flex flex-column gap-2 px-3'>
+                    {tasks?.map((x) => (
+                        <TaskRow key={x.id} task={x} />
+                    ))}
+                </div>
+                <div className='d-flex justify-content-center align-items-center gap-2'>
                     <div className='fs-80 '>
                         <div>
                             <FontAwesomeIcon className='text-success' icon={faSave} /> {formatDate(data.date)}
@@ -59,12 +65,6 @@ export function Tasks() {
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div className='d-flex flex-column gap-2 px-3'>
-                    {tasks?.map((x) => (
-                        <TaskRow key={x.id} task={x} />
-                    ))}
                 </div>
             </div>
         </TaskEditProvider>

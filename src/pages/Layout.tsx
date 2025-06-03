@@ -22,7 +22,7 @@ export function Layout() {
             <div className='h-100 d-flex flex-column'>
                 <OffCanvas />
                 <Navbar />
-                <div className='flex-grow-1 pt-5'>
+                <div className='flex-grow-1'>
                     <Outlet />
                 </div>
                 <Footer />

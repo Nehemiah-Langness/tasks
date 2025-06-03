@@ -76,6 +76,15 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
                             x.startDate += timezoneOffset * 60000;
                         }
                     });
+                    if (result.data.vacation) {
+                        const { vacation } = result.data;
+                        if (new Date(vacation.start).getHours() !== 0) {
+                            vacation.start += timezoneOffset * 60000;
+                        }
+                        if (new Date(vacation.end).getHours() !== 0) {
+                            vacation.end += timezoneOffset * 60000;
+                        }
+                    }
                     setTaskPool(result.pool);
                     setAllTasks(result.poolTasks);
                     return result.data;
@@ -129,6 +138,15 @@ export function StorageProvider({ children }: PropsWithChildren<object>) {
                             x.startDate += timezoneOffset * 60000;
                         }
                     });
+                    if (result.data.vacation) {
+                        const { vacation } = result.data;
+                        if (new Date(vacation.start).getHours() !== 0) {
+                            vacation.start += timezoneOffset * 60000;
+                        }
+                        if (new Date(vacation.end).getHours() !== 0) {
+                            vacation.end += timezoneOffset * 60000;
+                        }
+                    }
                     setAllTasks(result.poolTasks);
                     setTaskPool(result.pool);
                     return result.data;
