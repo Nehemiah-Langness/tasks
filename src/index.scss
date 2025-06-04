@@ -39,6 +39,10 @@ body,
     height: 100%;
 }
 
+body {
+    background: rgba(var(--bs-primary-rgb), 0.1);
+}
+
 .logo {
     background: var(--bs-light);
     border-radius: 25%;
@@ -121,4 +125,8 @@ body,
     to {
         top: 0rem;
     }
+}
+
+.btn-outline-primary {
+    background-color: var(--bs-white);
 }
