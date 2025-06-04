@@ -1,0 +1,79 @@
+.streak {
+    z-index: 5;
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: stretch;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    background: rgba(45, 21, 0, 0.8);
+    animation: streak-message 5s forwards ease-in-out;
+
+    > div {
+        padding: 2rem;
+        background: #ff5a00;
+        background: linear-gradient(
+            45deg,
+            rgba(255, 90, 0, 1) 0%,
+            rgba(255, 154, 0, 1) 60%,
+            rgba(255, 171, 0, 1) 85%,
+            rgba(255, 206, 0, 1) 100%
+        );
+        background-size: 400% 400%;
+        animation: streak 6s linear infinite;
+
+        color: white;
+        font-size: 1.5rem;
+        text-align: center;
+        font-style: italic;
+        font-weight: bold;
+        text-shadow: 0px 0px 10px #610000, 0px 0px 20px #a52600;
+        flex-grow: 1;
+    }
+}
+
+.streak-icon {
+    animation: flame 2s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes flame {
+    0% {
+        color: rgba(255, 90, 0, 1);
+    }
+    50% {
+        color: rgba(255, 154, 0, 1);
+    }
+    100% {
+        color: rgba(255, 206, 0, 1);
+    }
+}
+
+@keyframes streak {
+    0% {
+        background-position: 0% 50%;
+        color: white;
+    }
+    50% {
+        background-position: 100% 50%;
+        color: rgb(153, 229, 252);
+    }
+    100% {
+        background-position: 0% 50%;
+        color: white;
+    }
+}
+
+@keyframes streak-message {
+    0% {
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    95% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}

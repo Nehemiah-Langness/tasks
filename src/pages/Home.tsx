@@ -2,11 +2,12 @@ import { useStorage } from '../contexts/storage/useStorage';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { Today } from './home/Today';
 import { Link } from 'react-router';
-import { Streak } from './home/Streak';
-import { Dates } from '../services/dates';
+import { Banner } from './home/Banner';
+import { formatDate } from '../services/formatDate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUmbrellaBeach } from '@fortawesome/free-solid-svg-icons';
-import { formatDate } from '../services/formatDate';
+import { useVacation } from './home/useVacation';
+import { useVacationSettings } from './tasks/useVacationSettings';
 
 export function Home() {
     const { data } = useStorage();
@@ -18,36 +19,37 @@ export function Home() {
     return (
         <>
             <Banner />
-            <div className='container d-flex flex-column gap-4'>
+            <div className='d-flex flex-column gap-4'>
                 <Today />
-                <Link to={'/tasks'} className={`btn btn-outline-primary align-self-lg-center rounded-0 fw-bold px-5 py-3`}>
-                    Manage Your Tasks
-                </Link>
+                <div className='container d-flex flex-column gap-4'>
+                    <Link to={'/tasks'} className={`btn btn-outline-primary align-self-lg-center rounded-0 fw-bold px-5 py-3`}>
+                        Manage Your Tasks
+                    </Link>
+                </div>
+
+                <VacationFab />
             </div>
         </>
     );
 }
 
-function Banner() {
-    const { data } = useStorage();
+function VacationFab() {
+    const { upcomingVacation } = useVacation();
+    const {editVacation} = useVacationSettings()
 
-    if (!data) return null;
-
-    const vacation = data.vacation && Dates.today().valueOf() >= data.vacation.start && Dates.today().valueOf() <= data.vacation.end;
-
-    return vacation ? (
-        <div className='d-flex justify-content-center align-items-center bg-info-subtle text-info-emphasis fs-200 p-3 ff-cursive gap-3'>
-            <FontAwesomeIcon flip='horizontal' icon={faUmbrellaBeach} />
-            <div className=''>
-                On vacation until{' '}
-                {formatDate(data.vacation?.end ?? 0, {
+    if (upcomingVacation) {
+        return (
+            <button
+                style={{ zIndex: 1 }}
+                className='text-primary text-decoration-none position-fixed bottom-0 start-0 border border-info-subtle border-2 rounded-pill shadow bg-info-subtle mx-2 mb-2 px-3 py-2'
+                onClick={editVacation}
+            >
+                <FontAwesomeIcon icon={faUmbrellaBeach} />{' '}
+                {formatDate(upcomingVacation, {
                     date: true,
-                    summarize: true,
                 })}
-            </div>
-            <FontAwesomeIcon icon={faUmbrellaBeach} />
-        </div>
-    ) : (
-        <Streak />
-    );
+            </button>
+        );
+    }
+    return null;
 }

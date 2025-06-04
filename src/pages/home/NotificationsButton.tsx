@@ -46,7 +46,7 @@ export function NotificationsButton() {
   return (
     <button
       className="btn btn-primary rounded-circle d-flex align-items-center justify-content-center"
-      style={{ aspectRatio: 1 }}
+      style={{ width: '3rem', height: '3rem'}}
       onClick={async () => {
         if (subscription) {
           if (await cancelSubscription()) {
@@ -55,35 +55,9 @@ export function NotificationsButton() {
         } else {
           setSubscription(await subscribe())
         }
-        // const newSubscription = await subscribe();
-        // if (newSubscription) {
-        //   fetch(storageApiUrl.replace("data", "notify"), {
-        //     method: "POST",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify(newSubscription),
-        //   });
-        // }
-
-        // console.log(newSubscription);
       }}
     >
-      <FontAwesomeIcon icon={subscription ? faBell : faBellSlash} />
+      <FontAwesomeIcon className="fs-150" icon={subscription ? faBell : faBellSlash} />
     </button>
   );
 }
-
-// reg.showNotification("Tasks are due today", {
-//   tag: timestamp.toFixed(), // a unique ID
-//   body: "You have (X) tasks due today", // content of the push notification
-//   requireInteraction: true,
-//   data: {
-//     url: window.location.href, // pass the current url to the notification
-//   },
-//   badge: "/favicon.svg",
-//   icon: "/favicon.svg",
-//   image: "/bg.png",
-//   timestamp: timestamp, // set the time for the push notification
-//   renotify: true,
-// } as NotificationOptions

@@ -12,6 +12,9 @@ export function VacationForm({ save, vacation }: { vacation: Vacation; save: (t:
 
     useEffect(() => {
         setForm(vacation);
+        if (vacation) {
+            setEnabled(true)
+        }
     }, [vacation]);
 
     return (
@@ -29,7 +32,7 @@ export function VacationForm({ save, vacation }: { vacation: Vacation; save: (t:
                                 id={`checkbox-vacation`}
                             />
                             <label className='form-check-label' htmlFor={`checkbox-vacation`}>
-                                Vacation Mode
+                                Schedule Vacation
                             </label>
                         </div>
                     </div>

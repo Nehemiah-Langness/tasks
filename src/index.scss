@@ -15,6 +15,7 @@ $form-check-input-checked-color: #ebf2f9;
 @import './styles/typography';
 @import './styles/skeleton';
 @import './styles/message';
+@import './styles/streak';
 
 .form-control {
     border-top-style: none;
@@ -23,6 +24,13 @@ $form-check-input-checked-color: #ebf2f9;
 }
 .input-group-text {
     border-style: none;
+}
+.inset-0 {
+    inset: 0;
+}
+
+.text-shadow {
+    text-shadow: 0 0 5px rgba($black, 1);;
 }
 
 html,
@@ -51,7 +59,6 @@ body,
         margin-bottom: 0.3rem;
     }
 }
-
 
 .task-completed {
     position: relative;
@@ -113,74 +120,5 @@ body,
     }
     to {
         top: 0rem;
-    }
-}
-
-.streak {
-    position: relative;
-    padding: 0.5rem;
-    background: #ff5a00;
-    background: linear-gradient(
-        45deg,
-        rgba(255, 90, 0, 1) 0%,
-        rgba(255, 154, 0, 1) 60%,
-        rgba(255, 171, 0, 1) 85%,
-        rgba(255, 206, 0, 1) 100%
-    );
-    background-size: 400% 400%;
-    animation: streak 6s linear infinite;
-
-    color: white;
-    font-size: 1.5rem;
-    text-align: center;
-    font-style: italic;
-    font-weight: bold;
-    text-shadow: 0px 0px 10px #610000, 0px 0px 20px #a52600;
-
-    > .position-absolute {
-        svg {
-            top: 50%;
-            font-size: 6rem;
-            transform: translate(0, -30%) rotate(23deg);
-            color: #ff5a0099;
-            animation: flame 2s ease-in-out infinite alternate-reverse;
-        }
-    }
-
-    > .position-relative {
-        z-index: 1;
-    }
-}
-
-@keyframes flame {
-    0% {
-        color: #ff5a0099;
-        transform: translate(0, -30%) rotate(23deg);
-        font-size: 8rem;
-    }
-    50% {
-        color: #ff9a0099;
-        transform: translate(-1rem, -30%) rotate(26deg);
-        font-size: 9rem;
-    }
-    100% {
-        color: #a5260099;
-        transform: translate(-0.5rem, -30%) rotate(32deg);
-        font-size: 7rem;
-    }
-}
-
-@keyframes streak {
-    0% {
-        background-position: 0% 50%;
-        color: white;
-    }
-    50% {
-        background-position: 100% 50%;
-        color: rgb(153, 229, 252);
-    }
-    100% {
-        background-position: 0% 50%;
-        color: white;
     }
 }
