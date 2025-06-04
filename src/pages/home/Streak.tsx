@@ -9,7 +9,7 @@ export function Streak() {
     const [showStreak, setShowStreak] = useState(false);
 
     return (
-        data?.streak.days && (
+        !!data?.streak.days && (
             <>
                 <button
                     className='btn btn-primary rounded-circle d-flex align-items-center justify-content-center position-relative'

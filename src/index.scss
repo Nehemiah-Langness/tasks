@@ -55,7 +55,7 @@ body {
 }
 
 .form .form-group {
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.75rem;
 
     & > label {
         font-weight: 900;
@@ -129,4 +129,11 @@ body {
 
 .btn-outline-primary {
     background-color: var(--bs-white);
+}
+
+
+.dropdown-toggle::after {
+    border-top: var(--toggle-size, 0.3em) solid;
+    border-right: var(--toggle-size, 0.3em) solid transparent;
+    border-left: var(--toggle-size, 0.3em) solid transparent;
 }

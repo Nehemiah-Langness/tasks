@@ -1,14 +1,15 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, CSSProperties } from 'react';
 import { formatDate } from '../../services/formatDate';
 import { RecurrenceType, Task } from '../../types/SaveFile';
 import { getRecurrenceMode } from '../../services/getRecurrenceMode';
 import { Radio } from '../../components/Radio';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarDays } from '@fortawesome/free-regular-svg-icons';
+import { faCalendarDays, faSquare } from '@fortawesome/free-regular-svg-icons';
 import { Dates, Tasks } from '../../services/dates';
 import { DateInput } from '../../components/DateInput';
 import { useStorage } from '../../contexts/storage/useStorage';
 import { translateDayOfWeek } from '../../services/translateDayOfWeek';
+import { faSquareCheck } from '@fortawesome/free-solid-svg-icons';
 
 export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => void }) {
     const { allTasksInPool } = useStorage();
@@ -16,7 +17,7 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
     const [recurrenceMode, setRecurrenceMode] = useState<RecurrenceType>(RecurrenceType.Daily);
 
     const [dayOfWeek, setDayOfWeek] = useState([Dates.today().getUTCDay()]);
-    const [dayOfMonth, setDayOfMonth] = useState(Dates.today().getUTCDate());
+    const [dayOfMonth, setDayOfMonth] = useState([Dates.today().getUTCDate()]);
     const [yearInterval, setYearInterval] = useState(1);
     const [monthInterval, setMonthInterval] = useState(1);
     const [weekInterval, setWeekInterval] = useState(1);
@@ -34,7 +35,7 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
             if (mode === RecurrenceType.WeekDay) {
                 setDayOfWeek(task.filters.day ?? [0]);
             } else if (mode === RecurrenceType.MonthDay) {
-                setDayOfMonth(task.filters?.date?.[0] ?? 1);
+                setDayOfMonth(task.filters?.date ?? [1]);
                 setMonthInterval(task.filters.interval?.length ?? 1);
             } else if (mode === RecurrenceType.IntervalDay) {
                 setDayInterval(task.filters.interval?.length ?? 1);
@@ -52,7 +53,7 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
         () =>
             recurrenceMode === RecurrenceType.MonthDay
                 ? Tasks.nextDueDate(form.startDate, {
-                      date: [dayOfMonth],
+                      date: dayOfMonth,
                   })?.valueOf() ?? 0
                 : recurrenceMode === RecurrenceType.WeekDay
                 ? Tasks.nextDueDate(form.startDate, {
@@ -71,10 +72,10 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
                 recurrenceMode === RecurrenceType.MonthDay
                     ? {
                           type: recurrenceMode,
-                          date: [dayOfMonth],
+                          date: dayOfMonth,
                           interval: {
-                              length: monthInterval,
-                              step: 'month',
+                              length: 1,
+                              step: 'day',
                           },
                       }
                     : recurrenceMode === RecurrenceType.WeekDay
@@ -154,7 +155,7 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
                         </div>
                     ) : null}
                     <div className='form-group'>
-                        <label>Task Description</label>
+                        <label>What is your task?</label>
                         <input
                             type='text'
                             value={form.description}
@@ -163,58 +164,58 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
                         />
                     </div>
                     <div className='form-group'>
-                        <label>Recurrence</label>
+                        <label>When does it need done?</label>
                         <Radio
                             formValue={recurrenceMode}
                             onChange={(e) => setRecurrenceMode(e)}
                             value={RecurrenceType.Daily}
-                            label='Daily'
+                            label='Every day'
                         />
                         <Radio
                             formValue={recurrenceMode}
                             onChange={(e) => setRecurrenceMode(e)}
                             value={RecurrenceType.IntervalDay}
-                            label='Every X Days'
+                            label='Once every few days'
                         />
                         <Radio
                             formValue={recurrenceMode}
                             onChange={(e) => setRecurrenceMode(e)}
                             value={RecurrenceType.WeekDay}
-                            label='Specific Weekday'
+                            label='On specific weekdays'
                         />
                         <Radio
                             formValue={recurrenceMode}
                             onChange={(e) => setRecurrenceMode(e)}
                             value={RecurrenceType.IntervalWeek}
-                            label='Every X Weeks'
+                            label='Once every few weeks'
                         />
                         <Radio
                             formValue={recurrenceMode}
                             onChange={(e) => setRecurrenceMode(e)}
                             value={RecurrenceType.IntervalMonth}
-                            label='Every X Months'
+                            label='Once every few months'
                         />
                         <Radio
                             formValue={recurrenceMode}
                             onChange={(e) => setRecurrenceMode(e)}
                             value={RecurrenceType.MonthDay}
-                            label='Specific Day of the Month'
+                            label='On specific days of the month'
                         />
                         <Radio
                             formValue={recurrenceMode}
                             onChange={(e) => setRecurrenceMode(e)}
                             value={RecurrenceType.IntervalYear}
-                            label='Every X Years'
+                            label='Once every few years'
                         />
                     </div>
                     <div className='form-group'>
-                        <label>Beginning On</label>
+                        <label>When do you want to start?</label>
                         <DateInput value={form.startDate} setValue={(v) => changeForm('startDate', v)} />
                     </div>
                     {recurrenceMode === RecurrenceType.WeekDay ? (
                         <>
                             <div className='form-group'>
-                                <label>Weekday</label>
+                                <label>What weekdays do you want to do your task?</label>
                                 {new Array(7)
                                     .fill(0)
                                     .map((_x, i) => i)
@@ -241,26 +242,13 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
                                         </div>
                                     ))}
                             </div>
-                            <div className='form-group'>
-                                <label>Week Interval</label>
-                                <div className='input-group'>
-                                    <span className='input-group-text'>Every</span>
-                                    <input
-                                        type='number'
-                                        value={weekInterval}
-                                        onChange={(e) => setWeekInterval(isNaN(+e.target.value) ? 1 : +e.target.value)}
-                                        className='form-control'
-                                    />
-                                    <span className='input-group-text'>Weeks</span>
-                                </div>
-                            </div>
                         </>
                     ) : recurrenceMode === RecurrenceType.Daily ? (
                         <></>
                     ) : recurrenceMode === RecurrenceType.IntervalDay ? (
                         <>
                             <div className='form-group'>
-                                <label>Day Interval</label>
+                                <label>How many days between?</label>
                                 <div className='input-group'>
                                     <span className='input-group-text'>Every</span>
                                     <input
@@ -269,14 +257,14 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
                                         onChange={(e) => setDayInterval(isNaN(+e.target.value) ? 1 : +e.target.value)}
                                         className='form-control'
                                     />
-                                    <span className='input-group-text'>Days</span>
+                                    <span className='input-group-text'>Day{dayInterval === 1 ? '' : 's'}</span>
                                 </div>
                             </div>
                         </>
                     ) : recurrenceMode === RecurrenceType.IntervalWeek ? (
                         <>
                             <div className='form-group'>
-                                <label>Week Interval</label>
+                                <label>How many weeks between?</label>
                                 <div className='input-group'>
                                     <span className='input-group-text'>Every</span>
                                     <input
@@ -285,14 +273,14 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
                                         onChange={(e) => setWeekInterval(isNaN(+e.target.value) ? 1 : +e.target.value)}
                                         className='form-control'
                                     />
-                                    <span className='input-group-text'>Weeks</span>
+                                    <span className='input-group-text'>Week{weekInterval === 1 ? '' : 's'}</span>
                                 </div>
                             </div>
                         </>
                     ) : recurrenceMode === RecurrenceType.IntervalMonth ? (
                         <>
                             <div className='form-group'>
-                                <label>Month Interval</label>
+                                <label>How many months between?</label>
                                 <div className='input-group'>
                                     <span className='input-group-text'>Every</span>
                                     <input
@@ -301,14 +289,14 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
                                         onChange={(e) => setMonthInterval(isNaN(+e.target.value) ? 1 : +e.target.value)}
                                         className='form-control'
                                     />
-                                    <span className='input-group-text'>Months</span>
+                                    <span className='input-group-text'>Month{monthInterval === 1 ? '' : 's'}</span>
                                 </div>
                             </div>
                         </>
                     ) : recurrenceMode === RecurrenceType.IntervalYear ? (
                         <>
                             <div className='form-group'>
-                                <label>Year Interval</label>
+                                <label>How many years between?</label>
                                 <div className='input-group'>
                                     <span className='input-group-text'>Every</span>
                                     <input
@@ -317,32 +305,63 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
                                         onChange={(e) => setYearInterval(isNaN(+e.target.value) ? 1 : +e.target.value)}
                                         className='form-control'
                                     />
-                                    <span className='input-group-text'>Years</span>
+                                    <span className='input-group-text'>Year{yearInterval === 1 ? '' : 's'}</span>
                                 </div>
                             </div>
                         </>
                     ) : recurrenceMode === RecurrenceType.MonthDay ? (
                         <>
                             <div className='form-group'>
-                                <label>Day of Month</label>
-                                <input
-                                    type='number'
-                                    value={dayOfMonth}
-                                    onChange={(e) => setDayOfMonth(isNaN(+e.target.value) ? 1 : +e.target.value)}
-                                    className='form-control'
-                                />
-                            </div>
-                            <div className='form-group'>
-                                <label>Month Interval</label>
-                                <div className='input-group'>
-                                    <span className='input-group-text'>Every</span>
-                                    <input
-                                        type='number'
-                                        value={monthInterval}
-                                        onChange={(e) => setMonthInterval(isNaN(+e.target.value) ? 1 : +e.target.value)}
-                                        className='form-control'
-                                    />
-                                    <span className='input-group-text'>Months</span>
+                                <label>What days of the month?</label>
+                                <div className='dropdown d-flex flex-column'>
+                                    <button
+                                        className='btn d-flex justify-content-between align-items-center dropdown-toggle'
+                                        type='button'
+                                        data-bs-toggle='dropdown'
+                                        aria-expanded='false'
+                                        style={
+                                            {
+                                                '--bs-btn-bg': '#ebf2f9',
+                                                '--bs-btn-hover-bg': '#ebf2f9',
+                                                '--bs-btn-active-bg': '#ebf2f9',
+                                                '--bs-btn-focus-bg': '#ebf2f9',
+                                                '--bs-btn-border-color': '#ebf2f9',
+                                                '--bs-btn-hover-border-color': '#ebf2f9',
+                                                '--bs-btn-focus-border-color': '#ebf2f9',
+                                                '--bs-btn-active-border-color': '#ebf2f9',
+                                            } as CSSProperties
+                                        }
+                                    >
+                                        {dayOfMonth.sort().map(mapDayOfMonth).join(', ') || <>Select a day of the month</>}
+                                    </button>
+
+                                    <ul className='dropdown-menu' style={{ maxHeight: '10rem', overflowY: 'auto' }}>
+                                        {new Array(31)
+                                            .fill(0)
+                                            .map((_x, i) => i + 1)
+                                            .map((day) => (
+                                                <li key={day}>
+                                                    <div
+                                                        className='dropdown-item'
+                                                        style={{ cursor: 'pointer' }}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setDayOfMonth((p) =>
+                                                                p.includes(day) ? p.filter((x) => x !== day) : p.concat(day)
+                                                            );
+                                                        }}
+                                                    >
+                                                        <div className='d-flex align-items-center gap-2'>
+                                                            <FontAwesomeIcon
+                                                                className='fs-120'
+                                                                icon={dayOfMonth.includes(day) ? faSquareCheck : faSquare}
+                                                            />
+                                                            {mapDayOfMonth(day)}
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            ))}
+                                    </ul>
                                 </div>
                             </div>
                         </>
@@ -350,23 +369,37 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
                 </div>
             </div>
             <div className='form-group'>
-                <label className='fs-140'>Upcoming Schedule</label>
-                <div className='d-flex flex-column gap-1 py-1'>
-                    {(new Array(4).fill(null as Date | null) as (Date | null)[])
+                <button
+                    className='btn btn-light text-reset w-100 rounded-0 dropdown-toggle d-flex align-items-center justify-content-between'
+                    type='button'
+                    data-bs-toggle='collapse'
+                    data-bs-target='#schedule-preview'
+                    aria-expanded='false'
+                    aria-controls='schedule-preview'
+                    style={{'--toggle-size': '0.5rem'} as CSSProperties}
+                >
+                    <label className='fs-140'>Schedule Preview</label>
+                </button>
+                
+                <div id='schedule-preview' className='collapse list-group list-group-flush'>
+                    {(new Array(10).fill(null as Date | null) as (Date | null)[])
                         .reduce(
                             (c) => {
                                 const lastDate = c[c.length - 1];
                                 if (!lastDate) {
                                     return c;
                                 }
-                                return c.concat(Tasks.nextDueDate(lastDate, stagedTask.filters, Dates.increment(lastDate, 1, 'day')));
+
+                                const nextDueDate = Tasks.nextDueDate(lastDate, stagedTask.filters, Dates.increment(lastDate, 1, 'day'));
+                                console.log(nextDueDate);
+                                return c.concat(nextDueDate);
                             },
                             [stagedTask.startDate ? new Date(stagedTask.startDate) : Tasks.nextDueDate(Dates.today(), stagedTask.filters)]
                         )
-                        .map((x, i) =>
+                        .map((x) =>
                             x ? (
                                 <>
-                                    <div key={x.valueOf()} className='d-flex align-items-center gap-2 px-2'>
+                                    <div key={x.valueOf()} className='list-group-item d-flex gap-2 align-items-center'>
                                         <FontAwesomeIcon icon={faCalendarDays} />
                                         <span>
                                             {formatDate(x, {
@@ -376,7 +409,6 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
                                         </span>
                                         <div></div>
                                     </div>
-                                    {i < 4 && <div key={'div' + x.valueOf()} className='border-bottom'></div>}
                                 </>
                             ) : null
                         )}
@@ -387,4 +419,16 @@ export function TaskEditForm({ save, task }: { task: Task; save: (t: Task) => vo
             </button>
         </div>
     );
+}
+
+function mapDayOfMonth(day: number) {
+    return day === 31
+        ? 'Last day of the month'
+        : day % 10 === 1 && day !== 11
+        ? day + 'st'
+        : day % 10 === 2 && day !== 12
+        ? day + 'nd'
+        : day % 10 === 3 && day !== 13
+        ? day + 'rd'
+        : day + 'th';
 }

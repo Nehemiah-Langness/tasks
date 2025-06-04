@@ -43,11 +43,16 @@ export class Tasks {
         }
     }
 
+    static lastDayOfMonth(date: Date) {
+        return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();
+    }
+
     static dateMatchesFilter(date: Date | number, filters: Task['filters']) {
         const dateObject = Dates.date(date);
 
         const dayOfMonth = dateObject.getUTCDate();
-        if (filters.date && !filters.date.some((f) => f === dayOfMonth)) {
+        const lastDay = Tasks.lastDayOfMonth(dateObject);
+        if (filters.date && !filters.date.some((f) => f === dayOfMonth || f === 31 && (dayOfMonth === lastDay))) {
             return false;
         }
 
@@ -71,7 +76,7 @@ export class Tasks {
         let dateObject = Dates.date(date);
         let tries = 0;
         while (tries < 1000 && !meetsCriteria(dateObject)) {
-            dateObject = Dates.increment(dateObject, filters.interval?.length ?? 1, filters.interval?.step ?? 'day');
+            dateObject = Dates.date(Dates.increment(dateObject, filters.interval?.length ?? 1, filters.interval?.step ?? 'day'));
             tries += 1;
         }
 
