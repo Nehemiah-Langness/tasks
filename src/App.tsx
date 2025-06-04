@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import { Home } from "./pages/Home";
 import { Tasks } from "./pages/Tasks";
 import { ErrorMessage } from "./components/ErrorMessage";
-import { LoadingMessage } from "./components/LoadingMessage";
+import { LoggingInMessage } from "./components/LoggingInMessage";
 import { Layout } from "./pages/Layout";
 import { Login } from "./pages/Login";
 
@@ -11,7 +11,7 @@ function App() {
   const { isLoading, isAuthenticated, error } = useAuth0();
 
   if (isLoading) {
-    return <LoadingMessage />;
+    return <LoggingInMessage />;
   }
 
   if (error) {

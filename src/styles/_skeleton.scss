@@ -1,0 +1,25 @@
+.skeleton {
+  animation: skeleton 1s linear infinite alternate;
+}
+
+.skeleton-text {
+  animation: skeleton-color 1s linear infinite alternate;
+}
+
+@keyframes skeleton {
+  0% {
+    background-color: hsl(200, 20%, 80%);
+  }
+  100% {
+    background-color: hsl(200, 20%, 95%);
+  }
+}
+
+@keyframes skeleton-color {
+  0% {
+    color: hsl(200, 20%, 80%);
+  }
+  100% {
+    color: hsl(200, 20%, 95%);
+  }
+}

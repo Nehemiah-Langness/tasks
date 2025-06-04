@@ -1,6 +1,5 @@
 import { useStorage } from '../contexts/storage/useStorage';
 import { ErrorMessage } from '../components/ErrorMessage';
-import { LoadingMessage } from '../components/LoadingMessage';
 import { Today } from './home/Today';
 import { Link } from 'react-router';
 import { Streak } from './home/Streak';
@@ -13,32 +12,12 @@ export function Home() {
     const { data } = useStorage();
 
     if (data === null) {
-        return <ErrorMessage error='Unable to load your data' />;
+        return <ErrorMessage error='Unable to load your tasks' />;
     }
-
-    if (!data) {
-        return <LoadingMessage />;
-    }
-
-    const vacation = data.vacation && Dates.today().valueOf() >= data.vacation.start && Dates.today().valueOf() <= data.vacation.end;
 
     return (
         <>
-            {vacation ? (
-                <div className='d-flex justify-content-center align-items-center bg-info-subtle text-info-emphasis fs-200 p-3 ff-cursive gap-3'>
-                    <FontAwesomeIcon flip='horizontal' icon={faUmbrellaBeach} />
-                    <div className=''>
-                        On vacation until{' '}
-                        {formatDate(data.vacation?.end ?? 0, {
-                            date: true,
-                            summarize: true,
-                        })}
-                    </div>
-                    <FontAwesomeIcon icon={faUmbrellaBeach} />
-                </div>
-            ) : (
-                <Streak />
-            )}
+            <Banner />
             <div className='container d-flex flex-column gap-4'>
                 <Today />
                 <Link to={'/tasks'} className={`btn btn-outline-primary align-self-lg-center rounded-0 fw-bold px-5 py-3`}>
@@ -46,5 +25,29 @@ export function Home() {
                 </Link>
             </div>
         </>
+    );
+}
+
+function Banner() {
+    const { data } = useStorage();
+
+    if (!data) return null;
+
+    const vacation = data.vacation && Dates.today().valueOf() >= data.vacation.start && Dates.today().valueOf() <= data.vacation.end;
+
+    return vacation ? (
+        <div className='d-flex justify-content-center align-items-center bg-info-subtle text-info-emphasis fs-200 p-3 ff-cursive gap-3'>
+            <FontAwesomeIcon flip='horizontal' icon={faUmbrellaBeach} />
+            <div className=''>
+                On vacation until{' '}
+                {formatDate(data.vacation?.end ?? 0, {
+                    date: true,
+                    summarize: true,
+                })}
+            </div>
+            <FontAwesomeIcon icon={faUmbrellaBeach} />
+        </div>
+    ) : (
+        <Streak />
     );
 }

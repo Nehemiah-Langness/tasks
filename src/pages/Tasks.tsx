@@ -5,7 +5,6 @@ import { formatDate } from '../services/formatDate';
 import { useStorage } from '../contexts/storage/useStorage';
 import { useTasks } from '../contexts/tasks/useTasks';
 import { ErrorMessage } from '../components/ErrorMessage';
-import { LoadingMessage } from '../components/LoadingMessage';
 import { NewTaskButton } from './tasks/NewTaskButton';
 import { EditPoolButton } from './tasks/EditPoolButton';
 import { TaskRow } from './tasks/TaskRow';
@@ -18,11 +17,7 @@ export function Tasks() {
     const spaceRemaining = (spaceUsed * 100) / (spaceLeft + spaceUsed);
 
     if (data === null) {
-        return <ErrorMessage error='Unable to load your data' />;
-    }
-
-    if (!data) {
-        return <LoadingMessage />;
+        return <ErrorMessage error='Unable to load your tasks' />;
     }
 
     return (
@@ -36,36 +31,39 @@ export function Tasks() {
                     <EditPoolButton />
                     <VacationButton />
                 </div>
-                <div className='d-flex flex-column gap-2 px-3'>
-                    {tasks?.map((x) => (
-                        <TaskRow key={x.id} task={x} />
-                    ))}
+
+                <div className='d-flex flex-column gap-2'>
+                    {tasks
+                        ? tasks.map((x) => <TaskRow key={x.id} task={x} />)
+                        : new Array(3).fill(0).map((_x, i) => <div key={i} className='skeleton rounded' style={{ height: '7rem' }}></div>)}
                 </div>
-                <div className='d-flex justify-content-center align-items-center gap-2'>
-                    <div className='fs-80 '>
-                        <div>
-                            <FontAwesomeIcon className='text-success' icon={faSave} /> {formatDate(data.date)}
-                        </div>
-                        <div>
-                            <div
-                                className='progress position-relative'
-                                role='progressbar'
-                                aria-label='Example with label'
-                                aria-valuenow={spaceRemaining}
-                                aria-valuemin={0}
-                                aria-valuemax={100}
-                            >
+                {data && (
+                    <div className='d-flex justify-content-center align-items-center gap-2'>
+                        <div className='fs-80 '>
+                            <div>
+                                <FontAwesomeIcon className='text-success' icon={faSave} /> {formatDate(data.date)}
+                            </div>
+                            <div>
                                 <div
-                                    className='progress-bar overflow-visible text-dark'
-                                    style={{ width: `${spaceRemaining.toFixed()}%` }}
-                                ></div>
-                                <div className='position-absolute start-0 end-0 top-0 bottom-0 d-flex align-items-center justify-content-center'>
-                                    {(100 - spaceRemaining).toFixed()}% Available Space
+                                    className='progress position-relative'
+                                    role='progressbar'
+                                    aria-label='Example with label'
+                                    aria-valuenow={spaceRemaining}
+                                    aria-valuemin={0}
+                                    aria-valuemax={100}
+                                >
+                                    <div
+                                        className='progress-bar overflow-visible text-dark'
+                                        style={{ width: `${spaceRemaining.toFixed()}%` }}
+                                    ></div>
+                                    <div className='position-absolute start-0 end-0 top-0 bottom-0 d-flex align-items-center justify-content-center'>
+                                        {(100 - spaceRemaining).toFixed()}% Available Space
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
         </TaskEditProvider>
     );

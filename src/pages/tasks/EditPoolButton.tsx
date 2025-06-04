@@ -49,6 +49,10 @@ export function EditPoolButton() {
         }
     }, [close, open, poolConfig]);
 
+    if (!data) {
+        return <div className="skeleton rounded" style={{width: '9em'}}>&nbsp;</div>
+    }
+
     return (
         <button
             className='btn btn-link link-success text-decoration-none d-flex align-items-center gap-2 text-nowrap'

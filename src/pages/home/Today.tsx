@@ -52,7 +52,17 @@ export function Today() {
                     </div>
                 </div>
             </div>
-            {dueToday.length || pastDue.length ? (
+            {!tasks ? (
+                <TaskList>
+                    {new Array(5).fill(0).map((_x, i) => (
+                        <div key={i} style={{
+                            animationDelay: `0.${i}s`
+                        }} className='list-group-item skeleton fs-200 border-0 my-1 rounded'>
+                            &nbsp;
+                        </div>
+                    ))}
+                </TaskList>
+            ) : dueToday.length || pastDue.length ? (
                 <TaskList>
                     <div className='list-group-item text-center py-3 bg-primary-subtle border-0 position-relative overflow-hidden'>
                         <AnimatedBackground icon='soap-solid' />
@@ -67,15 +77,6 @@ export function Today() {
                         </div>
                     ))}
                     {DueItems}
-                    {/* {!!completedToday?.length && (
-                        <div className='list-group-item text-center py-3 bg-success-subtle position-relative overflow-hidden'>
-                            <AnimatedBackground />
-                            <div className='position-relative h5 mb-0 fw-normal' style={{ zIndex: 1 }}>
-                                <b>{completedToday.length}</b> task
-                                {completedToday.length === 1 ? '' : 's'} already completed
-                            </div>
-                        </div>
-                    )} */}
                     {CompletedItems}
                 </TaskList>
             ) : (

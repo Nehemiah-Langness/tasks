@@ -50,9 +50,13 @@ export function VacationButton() {
         }
     }, [close, open, vacation]);
 
+    if (!data) {
+        return <div className="skeleton rounded ms-lg-auto" style={{width: '9em'}}>&nbsp;</div>
+    }
+
     return (
         <button
-            className='btn btn-link link-primary ms-auto text-decoration-none d-flex align-items-center gap-2 text-nowrap'
+            className='btn btn-link link-primary ms-lg-auto text-decoration-none d-flex align-items-center gap-2 text-nowrap'
             onClick={() => {
                 setVacation(
                     data?.vacation ?? {

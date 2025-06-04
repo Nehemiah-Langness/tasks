@@ -13,6 +13,8 @@ $form-check-input-checked-color: #ebf2f9;
 
 @import '../node_modules/bootstrap/scss/bootstrap.scss';
 @import './styles/typography';
+@import './styles/skeleton';
+@import './styles/message';
 
 .form-control {
     border-top-style: none;
@@ -50,62 +52,6 @@ body,
     }
 }
 
-.message {
-    z-index: 100;
-    position: fixed;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem;
-    font-size: 2rem;
-    text-align: center;
-
-    animation: message 15s ease-in-out forwards;
-    backdrop-filter: blur(10px);
-
-    & > div {
-        border-radius: 0.5rem;
-        padding: 4rem;
-        height: 100%;
-        width: 100%;
-    }
-
-    &.criticism {
-        color: var(--bs-danger);
-        background: rgba(var(--bs-danger-rgb), 0.4);
-
-        & > div {
-            background: #e7e0c5;
-            background: center/cover no-repeat url('/paper.jpg');
-        }
-    }
-
-    &.praise {
-        color: var(--bs-dark);
-        background: rgba(var(--bs-primary-rgb), 0.4);
-        & > div {
-            background: #e7e0c5;
-            background: center/cover no-repeat url('/paper.jpg');
-        }
-    }
-}
-
-@keyframes message {
-    0% {
-        opacity: 0;
-    }
-    5% {
-        opacity: 1;
-    }
-
-    95% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
-}
 
 .task-completed {
     position: relative;
