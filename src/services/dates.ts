@@ -52,7 +52,7 @@ export class Tasks {
 
         const dayOfMonth = dateObject.getUTCDate();
         const lastDay = Tasks.lastDayOfMonth(dateObject);
-        if (filters.date && !filters.date.some((f) => f === dayOfMonth || f === 31 && (dayOfMonth === lastDay))) {
+        if (filters.date && !filters.date.some((f) => f === dayOfMonth || (f === 31 && dayOfMonth === lastDay))) {
             return false;
         }
 
@@ -131,6 +131,9 @@ export class Dates {
     }
 
     static date(date: Date | number) {
+        if (!date) {
+            date = Date.now();
+        }
         const dateObject = typeof date === 'number' ? new Date(date) : date;
         return new Date(dateObject.getUTCFullYear(), dateObject.getUTCMonth(), dateObject.getUTCDate());
     }
